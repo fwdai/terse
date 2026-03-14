@@ -2,11 +2,17 @@
 
 Tool that reduces token usage in LLM conversation history by removing unnecessary tokens from past messages. Target: machine reader (the model), not humans — output doesn't need to be readable.
 
+## Stack
+
+**Runtime:** Bun. Run everything with `bun`, not `node`.
+**Language:** TypeScript. No build step — Bun executes `.ts` directly.
+
 ## Files
 
-- `index.js` — core library (ESM, top-level await for optional deps)
-- `cli.js` — CLI interface
-- `package.json` — optional deps: `compromise`, `gpt-tokenizer`
+- `index.ts` — core library (ESM, top-level await for optional deps)
+- `cli.ts` — CLI interface
+- `tsconfig.json` — `moduleResolution: bundler`, `types: bun-types`
+- `package.json` — optional deps: `compromise`, `gpt-tokenizer`; dev: `bun-types`, `typescript`
 
 ## Architecture
 
@@ -79,10 +85,10 @@ const { messages, stats } = compressHistory(messages, config);
 ## CLI
 
 ```bash
-echo "text" | node cli.js --role assistant --tiers rules,nlp
-echo "text" | node cli.js --tokens gpt
-node cli.js history.json --tiers rules,nlp --tokens gpt
-node cli.js --diff < input.txt      # show what changed
+echo "text" | bun cli.ts --role assistant --tiers rules,nlp
+echo "text" | bun cli.ts --tokens gpt
+bun cli.ts history.json --tiers rules,nlp --tokens gpt
+bun cli.ts --diff < input.txt      # show what changed
 ```
 
 ## Key design decisions

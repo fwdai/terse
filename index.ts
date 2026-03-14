@@ -1,44 +1,84 @@
-// ── Optional dependencies (lazy-loaded) ─────────────────────────────────────
+import type { NLPDocument } from 'compromise/types/misc';
 
-let gptEncode = null;
+// ── Types ────────────────────────────────────────────────────────────────────
+
+export type Tier        = 'rules' | 'nlp' | 'llm';
+export type TokenMethod = 'chars' | 'gpt';
+
+export interface CompressConfig {
+  tiers:       Tier[];
+  tokenMethod: TokenMethod;
+}
+
+export interface CompressResult {
+  text:             string;
+  originalTokens:   number;
+  compressedTokens: number;
+  savedTokens:      number;
+  savedPercent:     number;
+}
+
+export interface Message {
+  role:    'user' | 'assistant';
+  content: string;
+  [key: string]: unknown;
+}
+
+export interface MessageWithStats extends Message {
+  _stats: Omit<CompressResult, 'text'>;
+}
+
+export interface HistoryResult {
+  messages: MessageWithStats[];
+  stats: {
+    totalOriginalTokens:   number;
+    totalCompressedTokens: number;
+    totalSavedTokens:      number;
+    totalSavedPercent:     number;
+  };
+}
+
+// ── Optional dependencies (lazy-loaded) ──────────────────────────────────────
+
+let gptEncode: ((text: string) => number[]) | null = null;
 try {
   const mod = await import('gpt-tokenizer');
   gptEncode = mod.encode;
 } catch { /* not installed; 'gpt' tokenMethod will throw if used */ }
 
-let nlp = null;
+let nlp: ((text: string) => NLPDocument) | null = null;
 try {
   const mod = await import('compromise');
-  nlp = mod.default;
+  nlp = mod.default as (text: string) => NLPDocument;
 } catch { /* not installed; 'nlp' tier will throw if used */ }
 
 // ── Config ───────────────────────────────────────────────────────────────────
 
 export const TIERS = {
-  RULES: 'rules', // boilerplate removal, phrase substitutions, whitespace
-  NLP:   'nlp',   // POS-based function word dropping, synonym optimization
-  LLM:   'llm',   // telegraphic rewrite, semantic compression (future)
+  RULES: 'rules' as const,
+  NLP:   'nlp'   as const,
+  LLM:   'llm'   as const,
 };
 
-export const DEFAULT_CONFIG = {
+export const DEFAULT_CONFIG: CompressConfig = {
   tiers:       [TIERS.RULES],
-  tokenMethod: 'chars',        // 'chars' | 'gpt'
+  tokenMethod: 'chars',
 };
 
-// ── Token counting ───────────────────────────────────────────────────────────
+// ── Token counting ────────────────────────────────────────────────────────────
 
-function estimateTokens(text, method = 'chars') {
+function estimateTokens(text: string, method: TokenMethod = 'chars'): number {
   if (method === 'gpt') {
-    if (!gptEncode) throw new Error('gpt-tokenizer not installed. Run: npm install gpt-tokenizer');
+    if (!gptEncode) throw new Error('gpt-tokenizer not installed. Run: bun add gpt-tokenizer');
     return gptEncode(text).length;
   }
   return Math.ceil(text.length / 4);
 }
 
-// ── Code/URL masking ─────────────────────────────────────────────────────────
+// ── Code/URL masking ──────────────────────────────────────────────────────────
 
-function maskProtected(text) {
-  const blocks = [];
+function maskProtected(text: string): { masked: string; blocks: string[] } {
+  const blocks: string[] = [];
   const masked = text
     .replace(/```[\s\S]*?```/g, (m) => { blocks.push(m); return `\x00B${blocks.length - 1}\x00`; })
     .replace(/`[^`\n]+`/g,     (m) => { blocks.push(m); return `\x00B${blocks.length - 1}\x00`; })
@@ -46,15 +86,13 @@ function maskProtected(text) {
   return { masked, blocks };
 }
 
-function unmaskProtected(text, blocks) {
+function unmaskProtected(text: string, blocks: string[]): string {
   return text.replace(/\x00B(\d+)\x00/g, (_, i) => blocks[parseInt(i)]);
 }
 
-// ── TIER 1: Rules ────────────────────────────────────────────────────────────
+// ── TIER 1: Rules ─────────────────────────────────────────────────────────────
 
-// Boilerplate: assistant
-
-const ASSISTANT_OPENERS = [
+const ASSISTANT_OPENERS: RegExp[] = [
   /^(Certainly|Sure|Absolutely|Of course|Indeed)[!,.]?\s*/i,
   /^Great (question|point)[!,.]?\s*/i,
   /^(That['']s a great|What a great) (question|point)[!,.]?\s*/i,
@@ -64,7 +102,7 @@ const ASSISTANT_OPENERS = [
   /^As an AI (language model|assistant)[,.]?\s*/i,
 ];
 
-const ASSISTANT_CLOSERS = [
+const ASSISTANT_CLOSERS: RegExp[] = [
   /\s*I hope this (helps|answers)[^.]*[.!]?\s*$/i,
   /\s*Hope that helps[.!]?\s*$/i,
   /\s*Let me know if you (have|need)[^.]*[.!?]\s*$/i,
@@ -74,16 +112,14 @@ const ASSISTANT_CLOSERS = [
   /\s*Please (let me know|feel free)[^.]*[.!]\s*$/i,
 ];
 
-function removeAssistantBoilerplate(text) {
+function removeAssistantBoilerplate(text: string): string {
   let result = text;
   for (const p of ASSISTANT_OPENERS) result = result.replace(p, '');
   for (const p of ASSISTANT_CLOSERS) result = result.replace(p, '');
   return result.trim();
 }
 
-// Boilerplate: user
-
-const USER_OPENERS = [
+const USER_OPENERS: RegExp[] = [
   /^Please[,.]?\s+/i,
   /^Kindly[,.]?\s+/i,
   /^(Sorry|Apologies)[,.]?\s+if this is( a)? (dumb|silly|basic|stupid|obvious) question[,.]?\s*(but\s+)?/i,
@@ -101,7 +137,7 @@ const USER_OPENERS = [
 
 const GERUND_TO_IMPERATIVE = /^([a-z]+ing)\b/;
 
-const USER_CLOSERS = [
+const USER_CLOSERS: RegExp[] = [
   /[,.]?\s*[Tt]hank(s| you)( (so much|a lot|in advance))?[.!]?\s*$/i,
   /[,.]?\s*[Ii] appreciate (it|your help|your (time|assistance))[.!]?\s*$/i,
   /[,.]?\s*[Tt]hanks for (your help|helping( me)?)[.!]?\s*$/i,
@@ -109,7 +145,7 @@ const USER_CLOSERS = [
   /[,.]?\s*[Ff]eel free to (ask|let me know)[^.]*[.!]?\s*$/i,
 ];
 
-function removeUserBoilerplate(text) {
+function removeUserBoilerplate(text: string): string {
   let result = text;
 
   for (const p of USER_CLOSERS) result = result.replace(p, '');
@@ -129,9 +165,7 @@ function removeUserBoilerplate(text) {
   return result.trim();
 }
 
-// Phrase substitutions
-
-const SUBSTITUTIONS = [
+const SUBSTITUTIONS: [RegExp, string][] = [
   [/\bin order to\b/gi,                          'to'],
   [/\bdue to the fact that\b/gi,                 'because'],
   [/\bat this point in time\b/gi,                'now'],
@@ -189,7 +223,7 @@ const SUBSTITUTIONS = [
   [/\bapproximately\b/gi,                        '~'],
 ];
 
-function applySubstitutions(text) {
+function applySubstitutions(text: string): string {
   let result = text;
   for (const [pattern, replacement] of SUBSTITUTIONS) {
     result = result.replace(pattern, replacement);
@@ -197,15 +231,14 @@ function applySubstitutions(text) {
   return result;
 }
 
-// Filler words — sentence-start only (safe without POS)
 const SENTENCE_START_FILLERS =
   /(?<=(?:^|[.!?])\s{0,3})(basically|essentially|simply|obviously|clearly|literally|honestly),?\s+/gim;
 
-function removeFillers(text) {
+function removeFillers(text: string): string {
   return text.replace(SENTENCE_START_FILLERS, '');
 }
 
-function normalizeWhitespace(text) {
+function normalizeWhitespace(text: string): string {
   return text
     .replace(/\n+/g, ' ')
     .replace(/[ \t]+/g, ' ')
@@ -215,7 +248,7 @@ function normalizeWhitespace(text) {
     .trim();
 }
 
-function applyRules(text, role) {
+function applyRules(text: string, role: string): string {
   let result = text;
   if (role === 'assistant') result = removeAssistantBoilerplate(result);
   if (role === 'user')      result = removeUserBoilerplate(result);
@@ -225,10 +258,9 @@ function applyRules(text, role) {
   return result;
 }
 
-// ── TIER 2: NLP ──────────────────────────────────────────────────────────────
+// ── TIER 2: NLP ───────────────────────────────────────────────────────────────
 
-// Verb synonyms — only substituted when word is used as a verb (POS-verified)
-const NLP_VERB_SYNONYMS = [
+const NLP_VERB_SYNONYMS: [string, string][] = [
   ['utilize',     'use'],
   ['initiate',    'start'],
   ['terminate',   'stop'],
@@ -247,8 +279,7 @@ const NLP_VERB_SYNONYMS = [
   ['request',     'ask'],
 ];
 
-// Noun synonyms — only substituted when word is used as a noun (POS-verified)
-const NLP_NOUN_SYNONYMS = [
+const NLP_NOUN_SYNONYMS: [string, string][] = [
   ['functionality', 'feature'],
   ['individual',    'person'],
   ['assistance',    'help'],
@@ -262,20 +293,15 @@ const NLP_NOUN_SYNONYMS = [
   ['component',     'part'],
 ];
 
-function applyNlp(text) {
-  if (!nlp) throw new Error('compromise not installed. Run: npm install compromise');
+function applyNlp(text: string): string {
+  if (!nlp) throw new Error('compromise not installed. Run: bun add compromise');
 
-  let doc = nlp(text);
+  const doc = nlp(text);
 
-  // Drop determiners (a, an, the) — safe for machine reader
   doc.remove('#Determiner');
-
-  // Drop intensifier adverbs globally (POS-verified, unlike rules tier which only caught sentence-start)
-  // Matches adverbs that modify adjectives/other adverbs, not verbs (e.g. "runs quickly" stays)
   doc.match('#Adverb (very|really|quite|extremely|highly|truly|absolutely|utterly|incredibly)').remove();
   doc.match('(very|really|quite|extremely|highly|truly|absolutely|utterly|incredibly) #Adjective').remove('#Adverb');
 
-  // Synonym substitution with POS verification
   for (const [from, to] of NLP_VERB_SYNONYMS) {
     doc.verbs().match(from).replaceWith(to);
   }
@@ -283,39 +309,31 @@ function applyNlp(text) {
     doc.nouns().match(from).replaceWith(to);
   }
 
-  // Clean up any double spaces left by removals
   return doc.text().replace(/[ \t]+/g, ' ').trim();
 }
 
-// ── TIER 3: LLM (future) ────────────────────────────────────────────────────
-// Planned: telegraphic rewrite, semantic compression, cross-message dedup
+// ── TIER 3: LLM (future) ──────────────────────────────────────────────────────
 
-function applyLlm(_text, _role) {
+function applyLlm(_text: string, _role: string): string {
   throw new Error('LLM tier not yet implemented');
 }
 
-// ── Pipeline ─────────────────────────────────────────────────────────────────
+// ── Pipeline ──────────────────────────────────────────────────────────────────
 
-const TIER_FNS = {
-  [TIERS.RULES]: (text, role) => applyRules(text, role),
-  [TIERS.NLP]:   (text)       => applyNlp(text),
-  [TIERS.LLM]:   (text, role) => applyLlm(text, role),
+const TIER_FNS: Record<Tier, (text: string, role: string) => string> = {
+  rules: applyRules,
+  nlp:   (text) => applyNlp(text),
+  llm:   applyLlm,
 };
 
-// ── Public API ───────────────────────────────────────────────────────────────
+// ── Public API ────────────────────────────────────────────────────────────────
 
-/**
- * Compress a single message.
- *
- * @param {string} text
- * @param {'user' | 'assistant'} role
- * @param {object} config
- * @param {string[]} config.tiers - ordered list of tiers to apply, e.g. ['rules', 'nlp']
- * @param {'chars'|'gpt'} config.tokenMethod
- * @returns {{ text, originalTokens, compressedTokens, savedTokens, savedPercent }}
- */
-export function compress(text, role = 'assistant', config = DEFAULT_CONFIG) {
-  const { tiers = [TIERS.RULES], tokenMethod = 'chars' } = config;
+export function compress(
+  text: string,
+  role: 'user' | 'assistant' = 'assistant',
+  config: CompressConfig = DEFAULT_CONFIG,
+): CompressResult {
+  const { tiers, tokenMethod } = config;
 
   const originalTokens = estimateTokens(text, tokenMethod);
   const { masked, blocks } = maskProtected(text);
@@ -323,7 +341,7 @@ export function compress(text, role = 'assistant', config = DEFAULT_CONFIG) {
   let result = masked;
   for (const tier of tiers) {
     const fn = TIER_FNS[tier];
-    if (!fn) throw new Error(`Unknown tier: "${tier}". Valid tiers: ${Object.values(TIERS).join(', ')}`);
+    if (!fn) throw new Error(`Unknown tier: "${tier}". Valid: ${Object.values(TIERS).join(', ')}`);
     result = fn(result, role);
   }
 
@@ -336,18 +354,14 @@ export function compress(text, role = 'assistant', config = DEFAULT_CONFIG) {
   return { text: result, originalTokens, compressedTokens, savedTokens, savedPercent };
 }
 
-/**
- * Compress an array of messages (conversation history).
- *
- * @param {Array<{ role: string, content: string }>} messages
- * @param {object} config
- * @returns {{ messages: Array, stats: object }}
- */
-export function compressHistory(messages, config = DEFAULT_CONFIG) {
+export function compressHistory(
+  messages: Message[],
+  config: CompressConfig = DEFAULT_CONFIG,
+): HistoryResult {
   let totalOriginal   = 0;
   let totalCompressed = 0;
 
-  const compressed = messages.map((msg) => {
+  const compressed = messages.map((msg): MessageWithStats => {
     const result = compress(msg.content, msg.role, config);
     totalOriginal   += result.originalTokens;
     totalCompressed += result.compressedTokens;
