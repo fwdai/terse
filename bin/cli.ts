@@ -1,6 +1,6 @@
 #!/usr/bin/env bun
-import { compress, compressHistory, TIERS, DEFAULT_CONFIG } from './index.ts';
-import type { CompressConfig, CompressResult, Tier } from './index.ts';
+import { compress, compressHistory, TIERS, DEFAULT_CONFIG } from '../src/index.ts';
+import type { CompressConfig, CompressResult, Tier } from '../src/index.ts';
 
 const args = process.argv.slice(2);
 

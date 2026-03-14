@@ -2,12 +2,12 @@
   "name": "context-compressor",
   "version": "0.1.0",
   "type": "module",
-  "main": "index.ts",
+  "main": "src/index.ts",
   "bin": {
-    "compress": "./cli.ts"
+    "compress": "./bin/cli.ts"
   },
   "scripts": {
-    "compress": "bun cli.ts"
+    "compress": "bun bin/cli.ts"
   },
   "optionalDependencies": {
     "gpt-tokenizer": "^2.1.2",

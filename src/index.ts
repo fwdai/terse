@@ -1,4 +1,4 @@
-import type { NLPDocument } from 'compromise/types/misc';
+import type View from 'compromise/view/three';
 
 // ── Types ────────────────────────────────────────────────────────────────────
 
@@ -46,10 +46,10 @@ try {
   gptEncode = mod.encode;
 } catch { /* not installed; 'gpt' tokenMethod will throw if used */ }
 
-let nlp: ((text: string) => NLPDocument) | null = null;
+let nlp: ((text: string) => View) | null = null;
 try {
   const mod = await import('compromise');
-  nlp = mod.default as (text: string) => NLPDocument;
+  nlp = mod.default as (text: string) => View;
 } catch { /* not installed; 'nlp' tier will throw if used */ }
 
 // ── Config ───────────────────────────────────────────────────────────────────
@@ -299,6 +299,8 @@ function applyNlp(text: string): string {
   const doc = nlp(text);
 
   doc.remove('#Determiner');
+  // remove() accepts no args (removes current selection) but types require match
+  // @ts-expect-error compromise types incomplete
   doc.match('#Adverb (very|really|quite|extremely|highly|truly|absolutely|utterly|incredibly)').remove();
   doc.match('(very|really|quite|extremely|highly|truly|absolutely|utterly|incredibly) #Adjective').remove('#Adverb');
 
