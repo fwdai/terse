@@ -1,0 +1,13 @@
+{
+  "name": "context-compressor",
+  "version": "0.1.0",
+  "type": "module",
+  "main": "index.js",
+  "bin": {
+    "compress": "./cli.js"
+  },
+  "optionalDependencies": {
+    "gpt-tokenizer": "^2.1.2",
+    "compromise": "^14.14.4"
+  }
+}
