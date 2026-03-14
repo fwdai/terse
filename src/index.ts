@@ -138,11 +138,12 @@ const USER_OPENERS: RegExp[] = [
 const GERUND_TO_IMPERATIVE = /^([a-z]+ing)\b/;
 
 const USER_CLOSERS: RegExp[] = [
-  /[,.]?\s*[Tt]hank(s| you)( (so much|a lot|in advance))?[.!]?\s*$/i,
-  /[,.]?\s*[Ii] appreciate (it|your help|your (time|assistance))[.!]?\s*$/i,
-  /[,.]?\s*[Tt]hanks for (your help|helping( me)?)[.!]?\s*$/i,
-  /[,.]?\s*[Pp]lease let me know if you need (more|any) (info|information|details|clarification)[.!]?\s*$/i,
-  /[,.]?\s*[Ff]eel free to (ask|let me know)[^.]*[.!]?\s*$/i,
+  // [,]? — consumes a preceding comma but NOT a period (preserves sentence-ending punctuation)
+  /[,]?\s*[Tt]hank(s| you)( (so much|a lot|in advance))?[.!]?\s*$/i,
+  /[,]?\s*[Ii] appreciate (it|your help|your (time|assistance))[.!]?\s*$/i,
+  /[,]?\s*[Tt]hanks for (your help|helping( me)?)[.!]?\s*$/i,
+  /[,]?\s*[Pp]lease let me know if you need (more|any) (info|information|details|clarification)[.!]?\s*$/i,
+  /[,]?\s*[Ff]eel free to (ask|let me know)[^.]*[.!]?\s*$/i,
 ];
 
 function removeUserBoilerplate(text: string): string {
@@ -220,13 +221,17 @@ const SUBSTITUTIONS: [RegExp, string][] = [
   [/\bet cetera\b/gi,                            'etc.'],
   [/\band so (on|forth)\b/gi,                    'etc.'],
   [/\bversus\b/gi,                               'vs.'],
-  [/\bapproximately\b/gi,                        '~'],
+  [/\bapproximately\s*/gi,                       '~'],
 ];
 
 function applySubstitutions(text: string): string {
   let result = text;
   for (const [pattern, replacement] of SUBSTITUTIONS) {
     result = result.replace(pattern, replacement);
+  }
+  // A deletion may have left the first letter lowercase — re-capitalize
+  if (/^[a-z]/.test(result)) {
+    result = result.charAt(0).toUpperCase() + result.slice(1);
   }
   return result;
 }
@@ -298,8 +303,8 @@ function applyNlp(text: string): string {
 
   const doc = nlp(text);
 
-  doc.remove('#Determiner');
-  // remove() accepts no args (removes current selection) but types require match
+  // Drop articles only (a, an, the) — demonstratives (this/that/these/those) carry meaning
+  doc.match('(a|an|the)').remove();
   // @ts-expect-error compromise types incomplete
   doc.match('#Adverb (very|really|quite|extremely|highly|truly|absolutely|utterly|incredibly)').remove();
   doc.match('(very|really|quite|extremely|highly|truly|absolutely|utterly|incredibly) #Adjective').remove('#Adverb');
