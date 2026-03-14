@@ -378,3 +378,50 @@ describe('compressHistory()', () => {
     expect(stats.totalSavedPercent).toBeGreaterThan(0);
   });
 });
+
+// ── Real API message formats ───────────────────────────────────────────────────
+
+describe('compressHistory() — non-string content pass-through', () => {
+  test('passes through null content without crashing', () => {
+    const messages = [{ role: 'assistant', content: null }] as any;
+    const { messages: result } = compressHistory(messages, rules);
+    expect(result[0]!.content).toBeNull();
+    expect(result[0]!._stats.savedTokens).toBe(0);
+  });
+
+  test('passes through array content without crashing or mutating', () => {
+    const blocks = [{ type: 'text', text: 'hello' }];
+    const messages = [{ role: 'user', content: blocks }] as any;
+    const { messages: result } = compressHistory(messages, rules);
+    expect(Array.isArray(result[0]!.content)).toBe(true);
+    expect(result[0]!.content).toEqual(blocks);
+  });
+
+  test('passes through tool role messages without compressing', () => {
+    const messages = [{ role: 'tool', tool_use_id: 'abc', content: '{"result":"ok"}' }] as any;
+    const { messages: result } = compressHistory(messages, rules);
+    expect(result[0]!.content).toBe('{"result":"ok"}');
+    expect(result[0]!._stats.savedTokens).toBe(0);
+  });
+
+  test('passes through system role messages without compressing', () => {
+    const messages = [{ role: 'system', content: 'Certainly! You are a helpful assistant.' }] as any;
+    const { messages: result } = compressHistory(messages, rules);
+    expect(result[0]!.content).toContain('Certainly');
+  });
+
+  test('compresses only user/assistant string messages in a mixed real-API history', () => {
+    const messages = [
+      { role: 'system',    content: 'Certainly! You are helpful.' },
+      { role: 'user',      content: 'Please explain closures. Thank you!' },
+      { role: 'assistant', content: null },
+      { role: 'tool',      content: '{"data":1}', tool_use_id: 'x' },
+    ] as any;
+    const { messages: result } = compressHistory(messages, rules);
+    expect(result[0]!.content).toContain('Certainly');  // system — not touched
+    expect(result[1]!.content).not.toContain('Please'); // user — compressed
+    expect(result[1]!.content).not.toContain('Thank you');
+    expect(result[2]!.content).toBeNull();              // null — passed through
+    expect(result[3]!.content).toBe('{"data":1}');      // tool — not touched
+  });
+});
