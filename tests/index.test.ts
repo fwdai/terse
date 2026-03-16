@@ -605,6 +605,130 @@ describe('rules tier — phrase substitutions', () => {
 
   test('"compared to" → "vs."', () =>
     expect(assistant('This is faster compared to the naive approach.')).toBe('This is faster vs. the naive approach.'));
+
+  // ── New: purpose / conditional ────────────────────────────────────────────────
+  test('"provided that" → "if"', () =>
+    expect(assistant('You can merge provided that all tests pass.')).toBe('You can merge if all tests pass.'));
+
+  // ── New: causal / concessive ──────────────────────────────────────────────────
+  test('"as a consequence of" → "due to"', () =>
+    expect(assistant('The system is slow as a consequence of the N+1 queries.'))
+      .toBe('The system is slow due to the N+1 queries.'));
+
+  test('"in contrast to" → "unlike"', () =>
+    expect(assistant('In contrast to Python, JavaScript is single-threaded.'))
+      .toBe('Unlike Python, JavaScript is single-threaded.'));
+
+  test('"in comparison with" → "vs."', () =>
+    expect(assistant('The new approach is faster in comparison with the old one.'))
+      .toBe('The new approach is faster vs. the old one.'));
+
+  // ── New: temporal ─────────────────────────────────────────────────────────────
+  test('"at the moment" → "now"', () =>
+    expect(assistant('The feature is not supported at the moment.')).toBe('The feature is not supported now.'));
+
+  test('"for the foreseeable future" → "for now"', () =>
+    expect(assistant('Keep the workaround for the foreseeable future.')).toBe('Keep the workaround for now.'));
+
+  test('"in the future" → "later"', () =>
+    expect(assistant('In the future, we can optimize this.')).toBe('Later, we can optimize this.'));
+
+  test('"in the long run" → "ultimately"', () =>
+    expect(assistant('In the long run, this saves memory.')).toBe('Ultimately, this saves memory.'));
+
+  // ── New: quantity ─────────────────────────────────────────────────────────────
+  test('"the vast majority of" → "most"', () =>
+    expect(assistant('The vast majority of requests succeed.')).toBe('Most requests succeed.'));
+
+  test('"a number of" → "several"', () =>
+    expect(assistant('There are a number of edge cases to handle.')).toBe('There are several edge cases to handle.'));
+
+  test('"a growing number of" → "more"', () =>
+    expect(assistant('A growing number of users are affected.')).toBe('More users are affected.'));
+
+  test('"an increasing number of" → "more"', () =>
+    expect(assistant('An increasing number of requests are failing.')).toBe('More requests are failing.'));
+
+  test('"a handful of" → "few"', () =>
+    expect(assistant('Only a handful of cases remain.')).toBe('Only few cases remain.'));
+
+  // ── New: connectives ─────────────────────────────────────────────────────────
+  test('"there is no need to" → "no need to"', () =>
+    expect(assistant("There is no need to restart the server.")).toBe('No need to restart the server.'));
+
+  test('"there\'s no need for" → "no need for"', () =>
+    expect(assistant("There's no need for a full rebuild.")).toBe("No need for a full rebuild."));
+
+  test('"in any case" → "anyway"', () =>
+    expect(assistant('In any case, the tests should cover this.')).toBe('Anyway, the tests should cover this.'));
+
+  test('"in that case" → "then"', () =>
+    expect(assistant('In that case, use a different algorithm.')).toBe('Then, use a different algorithm.'));
+
+  // ── New: action patterns ─────────────────────────────────────────────────────
+  test('"take note of" → "note"', () =>
+    expect(assistant('Take note of the order of operations.')).toBe('Note the order of operations.'));
+
+  test('"take advantage of" → "use"', () =>
+    expect(assistant('Take advantage of the built-in sort.')).toBe('Use the built-in sort.'));
+
+  test('"take care of" → "handle"', () =>
+    expect(assistant('The middleware will take care of authentication.')).toBe('The middleware will handle authentication.'));
+
+  test('"keep track of" → "track"', () =>
+    expect(assistant('Keep track of the connection count.')).toBe('Track the connection count.'));
+
+  test('"get rid of" → "remove"', () =>
+    expect(assistant('Get rid of the unused imports.')).toBe('Remove the unused imports.'));
+
+  test('"give rise to" → "cause"', () =>
+    expect(assistant('Circular imports give rise to subtle bugs.')).toBe('Circular imports cause subtle bugs.'));
+
+  test('"go ahead and" → "" (agentic)', () =>
+    expect(assistant("I'll go ahead and refactor the service layer.")).toBe("I'll refactor the service layer."));
+
+  test('"all you need to do is" → ""', () =>
+    expect(assistant('All you need to do is restart the server.')).toBe('Restart the server.'));
+
+  test('"what you need to do is" → ""', () =>
+    expect(assistant('What you need to do is update the config.')).toBe('Update the config.'));
+
+  // ── New: zero-value discourse markers ─────────────────────────────────────────
+  test('"that being said" → ""', () =>
+    expect(assistant('That being said, the fix is straightforward.')).toBe('The fix is straightforward.'));
+
+  test('"with that said" → ""', () =>
+    expect(assistant('With that said, let us proceed.')).toBe('Let us proceed.'));
+
+  test('"having said that" → ""', () =>
+    expect(assistant('Having said that, the tests are still failing.')).toBe('The tests are still failing.'));
+
+  test('"when all is said and done" → "ultimately"', () =>
+    expect(assistant('When all is said and done, simplicity wins.')).toBe('Ultimately, simplicity wins.'));
+
+  test('"long story short" → ""', () =>
+    expect(assistant('Long story short, the deploy failed.')).toBe('The deploy failed.'));
+
+  test('"the bottom line is that" → ""', () =>
+    expect(assistant('The bottom line is that performance matters.')).toBe('Performance matters.'));
+
+  test('"the bottom line is" → ""', () =>
+    expect(assistant('The bottom line is: use indexes.')).toBe('Use indexes.'));
+
+  test('"suffice it to say" → ""', () =>
+    expect(assistant('Suffice it to say, the API is unstable.')).toBe('The API is unstable.'));
+
+  test('"to put it simply" → ""', () =>
+    expect(assistant('To put it simply, the loop is O(n²).')).toBe('The loop is O(n²).'));
+
+  test('"with this in mind" → ""', () =>
+    expect(assistant('With this in mind, consider using a cache.')).toBe('Consider using a cache.'));
+
+  test('"as we discussed" → ""', () =>
+    expect(assistant('As we discussed, the timeout is 30s.')).toBe('The timeout is 30s.'));
+
+  test('"as we noted earlier" → ""', () =>
+    expect(assistant('As we noted earlier, avoid globals.')).toBe('Avoid globals.'));
 });
 
 describe('rules tier — filler words', () => {

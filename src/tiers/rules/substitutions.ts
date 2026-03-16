@@ -5,6 +5,8 @@
 // Intentionally excluded:
 //   "as a result" (mid-sentence form too ambiguous — position-dependent meaning)
 //   "be in a position to" → "can" (breaks "should be in a position to" → "should can")
+//   "going forward" / "moving forward" (breaks "going forward with X" mid-sentence)
+//   "make sure" → "ensure" (near-equal token cost)
 //   contractions (do not → don't) — handled better in NLP tier
 //   "in fact", "indeed" — too load-bearing mid-sentence to strip safely
 
@@ -21,6 +23,7 @@ export const SUBSTITUTIONS: [RegExp, string][] = [
   [/\bin order for\b/gi,                       'for'],
   [/\bfor the sake of\b/gi,                    'for'],
   [/\bfor the purpose of\b/gi,                 'for'],
+  [/\bprovided that\b/gi,                      'if'],
 
   // ── Ability / possibility ────────────────────────────────────────────────────
   [/\bhas the ability to\b/gi,                 'can'],
@@ -42,16 +45,23 @@ export const SUBSTITUTIONS: [RegExp, string][] = [
   [/\bdue to the fact that\b/gi,               'because'],
   [/\bon the grounds that\b/gi,                'because'],
   [/\bfor the reason that\b/gi,                'because'],
+  [/\bas a consequence of\b/gi,                'due to'],  // must precede "as a result of"
   [/\bas a result of\b/gi,                     'due to'],
   [/\bin the event that\b/gi,                  'if'],
+  [/\bin contrast (?:to|with)\b/gi,            'unlike'],
+  [/\bin comparison (?:to|with)\b/gi,          'vs.'],
   [/\bon the other hand\b/gi,                  'however'],
 
   // ── Temporal / frequency ────────────────────────────────────────────────────
   [/\bat this point in time\b/gi,              'now'],
   [/\bat the present time\b/gi,                'now'],
+  [/\bat the moment\b/gi,                      'now'],
   [/\bat the end of the day\b/gi,              'ultimately'],
+  [/\bin the long run\b/gi,                    'ultimately'],
+  [/\bfor the foreseeable future\b/gi,         'for now'],  // must precede "for the time being"
   [/\bfor the time being\b/gi,                 'for now'],
-  [/\bin the near future\b/gi,                 'soon'],
+  [/\bin the near future\b/gi,                 'soon'],     // must precede "in the future"
+  [/\bin the future\b/gi,                      'later'],
   [/\bin the meantime\b/gi,                    'meanwhile'],
   [/\bsooner or later\b/gi,                    'eventually'],
   [/\bat some point\b/gi,                      'eventually'],
@@ -65,11 +75,15 @@ export const SUBSTITUTIONS: [RegExp, string][] = [
   [/\bon a regular basis\b/gi,                 'regularly'],
 
   // ── Quantity / scope ─────────────────────────────────────────────────────────
+  [/\bthe vast majority of\b/gi,               'most'],     // must precede "the majority of"
   [/\ba significant number of\b/gi,            'many'],
   [/\ba large number of\b/gi,                  'many'],
+  [/\ba(?:n increasing| growing) number of\b/gi, 'more'],
+  [/\ba number of\b/gi,                        'several'],
   [/\ba wide variety of\b/gi,                  'many'],
   [/\ba wide range of\b/gi,                    'many'],
   [/\ba variety of\b/gi,                       'various'],
+  [/\ba handful of\b/gi,                       'few'],
   [/\bthe majority of\b/gi,                    'most'],
   [/\beach and every\b/gi,                     'every'],
   [/\bfor the most part\b/gi,                  'mostly'],
@@ -97,6 +111,9 @@ export const SUBSTITUTIONS: [RegExp, string][] = [
   [/\bfirst and foremost\b/gi,                 'first'],
   [/\bfirst of all\b/gi,                       'first'],
   [/\blast but not least\b/gi,                 'finally'],
+  [/\bthere(?:['']s| is) no need (to|for)\b/gi, 'no need $1'],
+  [/\bin any case\b/gi,                        'anyway'],
+  [/\bin that case\b/gi,                       'then'],
 
   // ── Action nominalizations → verb ────────────────────────────────────────────
   [/\bmakes? improvements to\b/gi,             'improve'],
@@ -119,24 +136,45 @@ export const SUBSTITUTIONS: [RegExp, string][] = [
   [/\bgive consideration to\b/gi,              'consider'],
   [/\bkeep in mind\b/gi,                       'note'],
   [/\bbear in mind\b/gi,                       'note'],
+  [/\btake note of\b/gi,                       'note'],
+  [/\btake advantage of\b/gi,                  'use'],
+  [/\btake care of\b/gi,                       'handle'],
+  [/\bkeep track of\b/gi,                      'track'],
+  [/\bget rid of\b/gi,                         'remove'],
+  [/\bgive rise to\b/gi,                       'cause'],
   [/\bprovide assistance( to)?\b/gi,           'help'],
   [/\bcome to the conclusion\b/gi,             'conclude'],
   [/\breach a conclusion\b/gi,                 'conclude'],
   [/\bcome to an agreement\b/gi,               'agree'],
+  [/\ball you (?:need|have) to do is\s*/gi,    ''],        // must precede shorter patterns
+  [/\bwhat you (?:need|have) to do is\s*/gi,   ''],
+  [/\bgo ahead and\s*/gi,                      ''],        // "I'll go ahead and fix" → "I'll fix"
 
   // ── Zero-value discourse markers → delete entirely ───────────────────────────
-  [/\bas (previously |already )?mentioned( (?:above|before|earlier))?[,]?\s*/gi, ''],
-  [/\bas noted( (?:above|before|earlier))?[,]?\s*/gi,                            ''],
-  [/\bit (is|should be) (worth noting|noted) that[,]?\s*/gi,                     ''],
-  [/\bit is important to note that[,]?\s*/gi,                                     ''],
-  [/\bit['']s worth (noting|mentioning) that[,]?\s*/gi,                           ''],
-  [/\bit is (?:clear|evident|obvious) that[,]?\s*/gi,                             ''],
-  [/\bas you can see[,]?\s*/gi,                                                    ''],
-  [/\bit goes without saying( that)?[,]?\s*/gi,                                   ''],
-  [/\bneedless to say[,]?\s*/gi,                                                   ''],
-  [/\bas a matter of fact[,]?\s*/gi,                                               ''],
-  [/\bin actual fact[,]?\s*/gi,                                                    ''],
-  [/\bthe fact that\b/gi,                                                          'that'],
+  [/\bas (previously |already )?mentioned( (?:above|before|earlier))?[,]?\s*/gi,          ''],
+  [/\bas noted( (?:above|before|earlier))?[,]?\s*/gi,                                     ''],
+  [/\bas we (?:discussed|noted|covered|mentioned)(?:\s+(?:above|before|earlier))?[,]?\s*/gi, ''],
+  [/\bit (is|should be) (worth noting|noted) that[,]?\s*/gi,                              ''],
+  [/\bit is important to note that[,]?\s*/gi,                                              ''],
+  [/\bit['']s worth (noting|mentioning) that[,]?\s*/gi,                                   ''],
+  [/\bit is (?:clear|evident|obvious) that[,]?\s*/gi,                                     ''],
+  [/\bas you can see[,]?\s*/gi,                                                            ''],
+  [/\bit goes without saying( that)?[,]?\s*/gi,                                           ''],
+  [/\bneedless to say[,]?\s*/gi,                                                           ''],
+  [/\bas a matter of fact[,]?\s*/gi,                                                       ''],
+  [/\bin actual fact[,]?\s*/gi,                                                            ''],
+  [/\bthat being said[,]?\s*/gi,                                                           ''],
+  [/\bwith that said[,]?\s*/gi,                                                            ''],
+  [/\bhaving said that[,]?\s*/gi,                                                          ''],
+  [/\bwhen all is said and done\b/gi,                                                      'ultimately'],
+  [/\blong story short[,:]?\s*/gi,                                                         ''],
+  [/\bto make a long story short[,:]?\s*/gi,                                               ''],
+  [/\bthe bottom line is that\b\s*/gi,                                                     ''],  // must precede next
+  [/\bthe bottom line is[,:]?\s*/gi,                                                       ''],
+  [/\bsuffice it to say( that)?[,:]?\s*/gi,                                                ''],
+  [/\bto put it simply[,:]?\s*/gi,                                                         ''],
+  [/\bwith (?:this|that) in mind[,]?\s*/gi,                                                ''],
+  [/\bthe fact that\b/gi,                                                                   'that'],
 
   // ── Standard abbreviations ───────────────────────────────────────────────────
   [/\bthat is to say\b/gi,                     'i.e.'],
