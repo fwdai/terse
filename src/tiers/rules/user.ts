@@ -2,6 +2,21 @@
 // Add new openers/closers here as they're discovered.
 
 export const USER_OPENERS: RegExp[] = [
+  // Greetings — longer/name-taking forms first so "Hi Claude," beats "Hi,"
+  /^(Hey|Hi|Hello)\s+\w+[,.!]\s*/i,          // "Hi Claude, " / "Hey there, "
+  /^(Hey|Hi|Hello)[,!.]?\s+/i,               // "Hi, " / "Hey! " / "Hello "
+
+  // Continuation starters (chained: "Also, can you" → "can you" → stripped next pass)
+  /^(Also|Additionally)[,.]\s*/i,            // "Also, " / "Additionally, "
+  /^And[,.]\s*/i,                            // "And, "
+
+  // Quick/follow-up question labels
+  /^Quick question[,:!]?\s*/i,
+  /^Just a quick (question|one)[,:!]?\s*/i,
+  /^(One|Another) (more|quick) (thing|question)[,:!]?\s*/i,
+  /^Follow[- ]?up (question\s*)?[,:!]?\s*/i,
+  /^(Newbie|Beginner|Novice) question[,:!]?\s*/i,
+
   /^Please[,.]?\s+/i,
   /^Kindly[,.]?\s+/i,
 
@@ -11,11 +26,20 @@ export const USER_OPENERS: RegExp[] = [
   /^This might be obvious[,.]?\s+but\s*/i,
   /^Forgive me if (I['']m wrong|this is obvious)[,.]?\s+but\s*/i,
   /^Not sure if this is (relevant|the right place)[,.]?\s+but\s*/i,
+  /^I might be wrong[,.]?\s+(but\s+)?/i,
+  /^I may be wrong[,.]?\s+(but\s+)?/i,
+  /^Correct me if I['']m wrong[,.]?\s+(but\s+)?/i,
+  /^I['']m (probably |likely )?wrong[,.]?\s+(but\s+)?/i,
+  /^I['']m not sure (if|whether) this is (right|correct|relevant)[,.]?\s*(but\s+)?/i,
 
   // "I have a question about X" → keep X
   /^I (have|had) a (quick\s+)?(question|query)[,.]?\s*(about|on|regarding)?\s*/i,
 
   // Request preambles — remainder is re-capitalized after removal
+  /^Do you think you could\s+/i,
+  /^Would it be possible( for you)? to\s+/i,
+  /^I was hoping (you could|you can)\s+/i,
+  /^I['']m hoping (you could|you can)\s+/i,
   /^(Can|Could) you (please\s+)?(help me\s+)?/i,
   /^Would you (be able to|mind\s+)/i,
   /^I(['']d like| want| need)( you)? to\s+/i,

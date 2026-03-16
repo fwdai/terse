@@ -20,6 +20,7 @@ src/
     rules/
       index.ts              ← applyRules() — orchestrates sub-passes in order
       assistant.ts          ← ASSISTANT_OPENERS/CLOSERS + removeAssistantBoilerplate
+      structural.ts         ← STRUCTURAL patterns + removeStructuralMetaCommentary
       user.ts               ← USER_OPENERS/CLOSERS + removeUserBoilerplate
       substitutions.ts      ← SUBSTITUTIONS vocab + applySubstitutions
       fillers.ts            ← SENTENCE_START_FILLERS + removeFillers
@@ -69,6 +70,7 @@ Tiers applied in declared order, each receives output of previous.
 ### Tier 1: Rules
 
 - `removeAssistantBoilerplate` — strips openers (Certainly!, Great question!, I'd be happy to...) and closers (I hope this helps!, Let me know if...)
+- `removeStructuralMetaCommentary` — strips announcement frames that introduce inline content: "Here is X:", "Below are X:", "The following X:", "I've outlined X:". Colon required — guarantees payload is present. Assistant only.
 - `removeUserBoilerplate` — strips politeness (Please, Thank you), request preambles (Can you, Could you, I'd like you to, I was wondering if), self-deprecating hedges (Sorry if this is a dumb question). Re-capitalizes remainder. Gerund→imperative fix for leftovers. USER_CLOSERS use `[,]?` not `[,.]?` — preserves sentence-ending periods.
 - `applySubstitutions` — ~50-entry phrase dict: "in order to"→"to", "due to the fact that"→"because", "for example"→"e.g.", zero-value markers deleted, etc. Re-capitalizes if deletion lowercased first letter.
 - `removeFillers` — sentence-start only (safe without POS): basically, essentially, obviously, etc.

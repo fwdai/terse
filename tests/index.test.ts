@@ -132,6 +132,66 @@ describe('rules tier — user boilerplate', () => {
       expect(user('Please write a sorting function. Thank you!')).toBe('Write a sorting function.'));
   });
 
+  describe('greetings', () => {
+    test('strips "Hi, "', () =>
+      expect(user('Hi, write me a sorting function.')).toBe('Write me a sorting function.'));
+
+    test('strips "Hey! "', () =>
+      expect(user('Hey! Explain how closures work.')).toBe('Explain how closures work.'));
+
+    test('strips "Hi Claude, " — name-taking greeting', () =>
+      expect(user('Hi Claude, can you fix this bug?')).toBe('Fix this bug?'));
+
+    test('strips "Hey there, "', () =>
+      expect(user('Hey there, what is a monad?')).toBe('What is a monad?'));
+  });
+
+  describe('quick question / continuation starters', () => {
+    test('strips "Quick question:"', () =>
+      expect(user('Quick question: how does memoization work?')).toBe('How does memoization work?'));
+
+    test('strips "Just a quick question:"', () =>
+      expect(user('Just a quick question: what is the difference between null and undefined?'))
+        .toBe('What is the difference between null and undefined?'));
+
+    test('strips "One more thing:" — chains into request preamble', () =>
+      expect(user('One more thing: can you add error handling?')).toBe('Add error handling?'));
+
+    test('strips "Follow-up question:"', () =>
+      expect(user('Follow-up question: why does this return undefined?')).toBe('Why does this return undefined?'));
+
+    test('strips "Also," — chains into request preamble', () =>
+      expect(user('Also, can you add tests?')).toBe('Add tests?'));
+
+    test('strips "And," — chains into request preamble', () =>
+      expect(user('And, could you update the docs?')).toBe('Update the docs?'));
+  });
+
+  describe('additional hedges', () => {
+    test('strips "I might be wrong, but"', () =>
+      expect(user('I might be wrong, but this looks like a memory leak.')).toBe('This looks like a memory leak.'));
+
+    test('strips "Correct me if I\'m wrong, but"', () =>
+      expect(user("Correct me if I'm wrong, but the timeout should be 30s.")).toBe('The timeout should be 30s.'));
+
+    test('strips "I\'m not sure if this is right, but"', () =>
+      expect(user("I'm not sure if this is right, but I think we need to flush the cache."))
+        .toBe('I think we need to flush the cache.'));
+  });
+
+  describe('additional request preambles', () => {
+    test('strips "Do you think you could"', () =>
+      expect(user('Do you think you could explain the difference between process and thread?'))
+        .toBe('Explain the difference between process and thread?'));
+
+    test('strips "Would it be possible to"', () =>
+      expect(user('Would it be possible to rewrite this without recursion?'))
+        .toBe('Rewrite this without recursion?'));
+
+    test('strips "I was hoping you could"', () =>
+      expect(user('I was hoping you could review this PR.')).toBe('Review this PR.'));
+  });
+
   describe('preserved user content', () => {
     test('keeps "I think" — epistemic signal', () =>
       expect(user('I think the issue is on line 42.')).toBe('I think the issue is on line 42.'));
@@ -177,6 +237,108 @@ describe('rules tier — phrase substitutions', () => {
 
   test('zero-value markers deleted: "needless to say"', () =>
     expect(assistant('Needless to say, tests should pass.')).toBe('Tests should pass.'));
+
+  // ── Purpose clauses ──────────────────────────────────────────────────────────
+  test('"with the aim of" → "to"', () =>
+    expect(assistant('Refactor with the aim of reducing complexity.')).toBe('Refactor to reducing complexity.'));
+
+  test('"in an effort to" → "to"', () =>
+    expect(assistant('Cache the result in an effort to speed up queries.')).toBe('Cache the result to speed up queries.'));
+
+  test('"for the sake of" → "for"', () =>
+    expect(assistant('Add a comment for the sake of clarity.')).toBe('Add a comment for clarity.'));
+
+  // ── Causal / concessive ───────────────────────────────────────────────────────
+  test('"despite the fact that" → "although"', () =>
+    expect(assistant('It works despite the fact that the input is malformed.'))
+      .toBe('It works although the input is malformed.'));
+
+  test('"as a result of" → "due to"', () =>
+    expect(assistant('The build failed as a result of a missing dependency.'))
+      .toBe('The build failed due to a missing dependency.'));
+
+  test('"on the other hand" → "however"', () =>
+    expect(assistant('This is fast. On the other hand, it uses more memory.'))
+      .toBe('This is fast. however, it uses more memory.'));
+
+  // ── Temporal ─────────────────────────────────────────────────────────────────
+  test('"at the end of the day" → "ultimately"', () =>
+    expect(assistant('At the end of the day, correctness matters more than speed.'))
+      .toBe('Ultimately, correctness matters more than speed.'));
+
+  test('"for the time being" → "for now"', () =>
+    expect(assistant('Use a placeholder for the time being.')).toBe('Use a placeholder for now.'));
+
+  test('"from time to time" → "sometimes"', () =>
+    expect(assistant('The cache is invalidated from time to time.')).toBe('The cache is invalidated sometimes.'));
+
+  test('"on a daily basis" → "daily"', () =>
+    expect(assistant('The job runs on a daily basis.')).toBe('The job runs daily.'));
+
+  // ── Quantity / scope ──────────────────────────────────────────────────────────
+  test('"a wide range of" → "many"', () =>
+    expect(assistant('It supports a wide range of formats.')).toBe('It supports many formats.'));
+
+  test('"in addition to" → "beyond"', () =>
+    expect(assistant('In addition to tests, we need docs.')).toBe('Beyond tests, we need docs.'));
+
+  test('"in addition" → "also" (does not fire when "to" follows)', () =>
+    expect(assistant('It is fast. In addition, it is reliable.')).toBe('It is fast. also, it is reliable.'));
+
+  test('"each and every" → "every"', () =>
+    expect(assistant('Each and every request must be authenticated.')).toBe('Every request must be authenticated.'));
+
+  // ── Connectives / discourse ───────────────────────────────────────────────────
+  test('"when it comes to" → "for"', () =>
+    expect(assistant('When it comes to performance, use indexes.')).toBe('For performance, use indexes.'));
+
+  test('"by means of" → "via"', () =>
+    expect(assistant('Authenticate by means of an API key.')).toBe('Authenticate via an API key.'));
+
+  test('"on the basis of" → "based on"', () =>
+    expect(assistant('Choose the algorithm on the basis of input size.')).toBe('Choose the algorithm based on input size.'));
+
+  test('"keep in mind" → "note"', () =>
+    expect(assistant('Keep in mind that this is O(n).')).toBe('Note that this is O(n).'));
+
+  test('"the reason why" → "why"', () =>
+    expect(assistant('The reason why this fails is the null check.')).toBe('Why this fails is the null check.'));
+
+  // ── Action nominalizations ────────────────────────────────────────────────────
+  test('"makes changes to" → "change"', () =>
+    expect(assistant('The migration makes changes to the schema.')).toBe('The migration change the schema.'));
+
+  test('"take a look at" → "check"', () =>
+    expect(assistant('Take a look at the error log.')).toBe('Check the error log.'));
+
+  test('"have an impact on" → "affect"', () =>
+    expect(assistant('This will have an impact on performance.')).toBe('This will affect performance.'));
+
+  test('"has an effect on" → "affects"', () =>
+    expect(assistant('Caching has an effect on latency.')).toBe('Caching affects latency.'));
+
+  // ── Zero-value markers ────────────────────────────────────────────────────────
+  test('"it is clear that" → ""', () =>
+    expect(assistant('It is clear that the loop is O(n).')).toBe('The loop is O(n).'));
+
+  test('"as you can see" → ""', () =>
+    expect(assistant('As you can see, the output is correct.')).toBe('The output is correct.'));
+
+  test('"as mentioned" → ""', () =>
+    expect(assistant('As mentioned, the fix is on line 42.')).toBe('The fix is on line 42.'));
+
+  test('"as previously mentioned above" → ""', () =>
+    expect(assistant('As previously mentioned above, avoid globals.')).toBe('Avoid globals.'));
+
+  // ── Standard abbreviations (new) ─────────────────────────────────────────────
+  test('"for instance" → "e.g."', () =>
+    expect(assistant('Use a short-circuit, for instance an early return.')).toBe('Use a short-circuit, e.g. an early return.'));
+
+  test('"as opposed to" → "vs."', () =>
+    expect(assistant('Use composition as opposed to inheritance.')).toBe('Use composition vs. inheritance.'));
+
+  test('"compared to" → "vs."', () =>
+    expect(assistant('This is faster compared to the naive approach.')).toBe('This is faster vs. the naive approach.'));
 });
 
 describe('rules tier — filler words', () => {
@@ -192,6 +354,36 @@ describe('rules tier — filler words', () => {
 
   test('does NOT remove "clearly" when it is an adjective', () =>
     expect(assistant('The code is clearly wrong.')).toBe('The code is clearly wrong.'));
+
+  test('removes "actually"', () =>
+    expect(assistant('Actually, the bug is in the parser.')).toBe('the bug is in the parser.'));
+
+  test('removes "frankly"', () =>
+    expect(assistant('Frankly, this approach will not scale.')).toBe('this approach will not scale.'));
+
+  test('removes "unfortunately"', () =>
+    expect(assistant('Unfortunately, there is no built-in way to do this.')).toBe('there is no built-in way to do this.'));
+
+  test('removes "importantly"', () =>
+    expect(assistant('Importantly, the tests still pass.')).toBe('the tests still pass.'));
+
+  test('removes "notably"', () =>
+    expect(assistant('Notably, this only affects Windows.')).toBe('this only affects Windows.'));
+
+  test('removes "interestingly"', () =>
+    expect(assistant('Interestingly, the slower algorithm wins here.')).toBe('the slower algorithm wins here.'));
+
+  test('removes "of course" phrase', () =>
+    expect(assistant('Of course, you need to restart the server.')).toBe('You need to restart the server.'));
+
+  test('removes "certainly"', () =>
+    expect(assistant('Certainly, that is one valid approach.')).toBe('That is one valid approach.'));
+
+  test('does NOT remove "theoretically" — qualifies the claim', () =>
+    expect(assistant('Theoretically, this should work.')).toBe('Theoretically, this should work.'));
+
+  test('does NOT remove "technically" — qualifies the claim', () =>
+    expect(assistant('Technically, this is correct.')).toBe('Technically, this is correct.'));
 });
 
 describe('rules tier — whitespace normalization', () => {
@@ -209,6 +401,47 @@ describe('rules tier — whitespace normalization', () => {
 
   test('normalizes repeated punctuation', () =>
     expect(assistant('What!!!')).toBe('What!'));
+});
+
+// ── Structural meta-commentary ────────────────────────────────────────────────
+
+describe('rules tier — structural meta-commentary', () => {
+  test('strips "Here is X:"', () =>
+    expect(assistant('Here is the solution: use a hash map.')).toBe('Use a hash map.'));
+
+  test('strips "Here\'s X:"', () =>
+    expect(assistant("Here's what you need: install the package.")).toBe('Install the package.'));
+
+  test('strips "Here are X:"', () =>
+    expect(assistant('Here are the steps: clone, install, run.')).toBe('Clone, install, run.'));
+
+  test('strips "Below is X:"', () =>
+    expect(assistant('Below is an example: update the config.')).toBe('Update the config.'));
+
+  test('strips "Below are X:"', () =>
+    expect(assistant('Below are the results: 3 passed, 0 failed.')).toBe('3 passed, 0 failed.'));
+
+  test('strips "The following X:"', () =>
+    expect(assistant('The following code fixes the bug: check the null case.')).toBe('Check the null case.'));
+
+  test('strips "The following is X:"', () =>
+    expect(assistant('The following is a list of options: A, B, C.')).toBe('A, B, C.'));
+
+  test('strips "I\'ve outlined X:"', () =>
+    expect(assistant("I've outlined the changes below: remove the loop.")).toBe('Remove the loop.'));
+
+  test('strips "I have described X:"', () =>
+    expect(assistant('I have described the fix above: update the config.')).toBe('Update the config.'));
+
+  test('does NOT strip when no colon — "Here is an example."', () =>
+    expect(assistant('Here is an example.')).toBe('Here is an example.'));
+
+  test('strips mid-text after sentence boundary', () =>
+    expect(assistant('The bug is confirmed. Here is the fix: delete line 42.'))
+      .toBe('The bug is confirmed. delete line 42.'));
+
+  test('is not applied to user turns', () =>
+    expect(user('Here is my code: const x = 1;')).toBe('Here is my code: const x = 1;'));
 });
 
 // ── Protected blocks ──────────────────────────────────────────────────────────
