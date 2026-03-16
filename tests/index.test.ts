@@ -241,8 +241,52 @@ describe('rules tier — user boilerplate', () => {
     test('removes "Thanks a lot"', () =>
       expect(user('Summarize this. Thanks a lot')).toBe('Summarize this.'));
 
+    test('removes "Thank you very much"', () =>
+      expect(user('Fix this bug. Thank you very much!')).toBe('Fix this bug.'));
+
+    test('removes "Thanks again"', () =>
+      expect(user('Explain closures. Thanks again!')).toBe('Explain closures.'));
+
+    test('removes "Many thanks"', () =>
+      expect(user('Review this PR. Many thanks')).toBe('Review this PR.'));
+
+    test('removes "Much appreciated"', () =>
+      expect(user('Refactor this function. Much appreciated!')).toBe('Refactor this function.'));
+
+    test('removes "Cheers"', () =>
+      expect(user('Add error handling. Cheers!')).toBe('Add error handling.'));
+
+    test('removes "I really appreciate it"', () =>
+      expect(user('Debug this for me. I really appreciate it.')).toBe('Debug this for me.'));
+
     test('removes "I appreciate your time"', () =>
       expect(user('Review this PR. I appreciate your time.')).toBe('Review this PR.'));
+
+    test('removes "Hope that makes sense"', () =>
+      expect(user('Here is the stack trace. Hope that makes sense.')).toBe('Here is the stack trace.'));
+
+    test('removes "Hope this helps clarify"', () =>
+      expect(user('I added more context above. Hope this helps clarify!')).toBe('I added more context above.'));
+
+    test('removes "Let me know if that\'s clear"', () =>
+      expect(user("I've described the issue above. Let me know if that's clear.")).toBe("I've described the issue above."));
+
+    test('removes "Just let me know if you need more context"', () =>
+      expect(user('Here is my code. Just let me know if you need more context.'))
+        .toBe('Here is my code.'));
+
+    test('removes "Happy to elaborate"', () =>
+      expect(user('That is the issue I am seeing. Happy to elaborate!')).toBe('That is the issue I am seeing.'));
+
+    test('removes "Happy to provide more details"', () =>
+      expect(user('The error only happens on prod. Happy to provide more details if needed.'))
+        .toBe('The error only happens on prod.'));
+
+    test('removes "Sorry for the long message"', () =>
+      expect(user('Fix this function. Sorry for the long message!')).toBe('Fix this function.'));
+
+    test('removes "Sorry if that\'s confusing"', () =>
+      expect(user("I know this is complex. Sorry if that's confusing.")).toBe('I know this is complex.'));
 
     test('removes opener and closer together', () =>
       expect(user('Please write a sorting function. Thank you!')).toBe('Write a sorting function.'));
@@ -260,6 +304,18 @@ describe('rules tier — user boilerplate', () => {
 
     test('strips "Hey there, "', () =>
       expect(user('Hey there, what is a monad?')).toBe('What is a monad?'));
+
+    test('strips "Good morning, "', () =>
+      expect(user('Good morning, can you review this PR?')).toBe('Review this PR?'));
+
+    test('strips "Good afternoon! "', () =>
+      expect(user('Good afternoon! What is a closure?')).toBe('What is a closure?'));
+
+    test('strips "Howdy, "', () =>
+      expect(user('Howdy, help me debug this.')).toBe('Help me debug this.'));
+
+    test('strips "Greetings! "', () =>
+      expect(user('Greetings! Explain async/await.')).toBe('Explain async/await.'));
   });
 
   describe('quick question / continuation starters', () => {
@@ -281,6 +337,42 @@ describe('rules tier — user boilerplate', () => {
 
     test('strips "And," — chains into request preamble', () =>
       expect(user('And, could you update the docs?')).toBe('Update the docs?'));
+
+    test('strips "Silly question:"', () =>
+      expect(user('Silly question: what does NaN mean?')).toBe('What does NaN mean?'));
+
+    test('strips "Hypothetical question:"', () =>
+      expect(user('Hypothetical question: what would happen if we removed the index?'))
+        .toBe('What would happen if we removed the index?'));
+  });
+
+  describe('acknowledgment / continuation starters (require comma)', () => {
+    test('strips "Okay, "', () =>
+      expect(user('Okay, can you also add logging?')).toBe('Also add logging?'));
+
+    test('strips "Alright, "', () =>
+      expect(user('Alright, now explain why this is slow.')).toBe('Now explain why this is slow.'));
+
+    test('strips "Right, "', () =>
+      expect(user('Right, so what should I change?')).toBe('So what should I change?'));
+
+    test('strips "Well, "', () =>
+      expect(user('Well, that makes sense but how do I fix it?')).toBe('That makes sense but how do I fix it?'));
+
+    test('strips "Great, " — acknowledgment, not compliment', () =>
+      expect(user('Great, can you also update the tests?')).toBe('Also update the tests?'));
+
+    test('strips "Wait, "', () =>
+      expect(user('Wait, that is not what I asked.')).toBe('That is not what I asked.'));
+
+    test('strips "Oh, "', () =>
+      expect(user('Oh, I see. Can you also explain X?')).toBe('I see. Can you also explain X?'));
+
+    test('strips "Hmm, "', () =>
+      expect(user('Hmm, I am not sure that is right.')).toBe('I am not sure that is right.'));
+
+    test('does NOT strip "Great" without comma — may be content', () =>
+      expect(user('Great work on the refactor!')).toBe('Great work on the refactor!'));
   });
 
   describe('additional hedges', () => {
@@ -293,6 +385,26 @@ describe('rules tier — user boilerplate', () => {
     test('strips "I\'m not sure if this is right, but"', () =>
       expect(user("I'm not sure if this is right, but I think we need to flush the cache."))
         .toBe('I think we need to flush the cache.'));
+
+    test('strips "I know this might be obvious, but"', () =>
+      expect(user('I know this might be obvious, but why does this return null?'))
+        .toBe('Why does this return null?'));
+
+    test('strips "I know this could be basic, but"', () =>
+      expect(user('I know this could be basic, but explain what a pointer is.'))
+        .toBe('Explain what a pointer is.'));
+
+    test("strips \"Forgive me if I'm wrong, but\"", () =>
+      expect(user("Forgive me if I'm wrong, but shouldn't this be async?"))
+        .toBe("Shouldn't this be async?"));
+
+    test('strips "Not sure if this is relevant, but"', () =>
+      expect(user('Not sure if this is relevant, but the error appears after a restart.'))
+        .toBe('The error appears after a restart.'));
+
+    test("strips \"I'm probably wrong, but\"", () =>
+      expect(user("I'm probably wrong, but this looks like a deadlock."))
+        .toBe('This looks like a deadlock.'));
   });
 
   describe('additional request preambles', () => {
@@ -306,6 +418,44 @@ describe('rules tier — user boilerplate', () => {
 
     test('strips "I was hoping you could"', () =>
       expect(user('I was hoping you could review this PR.')).toBe('Review this PR.'));
+
+    test('strips "Do you mind explaining"', () =>
+      expect(user('Do you mind explaining how garbage collection works?'))
+        .toBe('Explaining how garbage collection works?'));
+
+    test('strips "Could I ask you to"', () =>
+      expect(user('Could I ask you to rewrite this function without globals?'))
+        .toBe('Rewrite this function without globals?'));
+
+    test("strips \"I'd appreciate it if you could\"", () =>
+      expect(user("I'd appreciate it if you could add JSDoc comments."))
+        .toBe('Add JSDoc comments.'));
+
+    test("strips \"I'm hoping you could\"", () =>
+      expect(user("I'm hoping you could help me understand monads."))
+        .toBe('Help me understand monads.'));
+
+    test("strips \"I'm wondering if you could\"", () =>
+      expect(user("I'm wondering if you could generate a test suite for this module."))
+        .toBe('Generate a test suite for this module.'));
+  });
+
+  describe('availability-conditional openers', () => {
+    test('strips "If you have a moment, could you"', () =>
+      expect(user('If you have a moment, could you review my PR?'))
+        .toBe('Review my PR?'));
+
+    test('strips "If you have time, can you"', () =>
+      expect(user('If you have time, can you explain this error?'))
+        .toBe('Explain this error?'));
+
+    test('strips "Whenever you get a chance, can you"', () =>
+      expect(user('Whenever you get a chance, can you update the docs?'))
+        .toBe('Update the docs?'));
+
+    test('strips "When you have a minute, would you"', () =>
+      expect(user('When you have a minute, would you check this logic?'))
+        .toBe('Check this logic?'));
   });
 
   describe('preserved user content', () => {
