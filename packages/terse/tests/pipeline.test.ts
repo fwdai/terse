@@ -9,6 +9,23 @@ const both: CompressConfig = {
 const assistant = (text: string, cfg = both) =>
   compress(text, "assistant", cfg).text;
 
+describe("non-Latin bail-out", () => {
+  test("passes through Arabic text unchanged", () =>
+    expect(assistant("مرحبا، كيف حالك؟")).toBe("مرحبا، كيف حالك؟"));
+
+  test("passes through Chinese text unchanged", () =>
+    expect(assistant("你好，请问有什么可以帮助你的吗？")).toBe("你好，请问有什么可以帮助你的吗？"));
+
+  test("passes through Japanese text unchanged", () =>
+    expect(assistant("もちろんです！お役に立てて光栄です。")).toBe("もちろんです！お役に立てて光栄です。"));
+
+  test("passes through Ukrainian (Cyrillic) text unchanged", () =>
+    expect(assistant("Звичайно! Ось відповідь на ваше запитання.")).toBe("Звичайно! Ось відповідь на ваше запитання."));
+
+  test("Polish (Latin + diacritics) passes Latin check, no rules fire, returns unchanged", () =>
+    expect(assistant("Oczywiście! Chętnie Ci pomogę. Mam nadzieję, że to pomoże!")).toBe("Oczywiście! Chętnie Ci pomogę. Mam nadzieję, że to pomoże!"));
+});
+
 describe("protected blocks", () => {
   test("does not compress content inside fenced code blocks", () => {
     const text = "Here is an example:\n```\nfor example in order to\n```";
@@ -34,4 +51,25 @@ describe("protected blocks", () => {
     expect(result).not.toContain("I hope this helps");
     expect(result).toContain("const x = 1;");
   });
+});
+
+import { readFileSync } from 'fs';
+import { resolve } from 'path';
+
+interface CompressCase {
+  id: string; description: string;
+  role: 'user' | 'assistant'; tiers: string[]; input: string; output: string;
+}
+
+describe('pipeline — fixture contract', () => {
+  const cases: CompressCase[] = JSON.parse(
+    readFileSync(resolve(import.meta.dir, '../../../fixtures/pipeline/protected-blocks.json'), 'utf8')
+  );
+  for (const c of cases) {
+    const cfg = {
+      tiers: c.tiers.map(t => TIERS[t.toUpperCase() as keyof typeof TIERS]),
+      tokenMethod: 'chars' as const,
+    };
+    test(c.id, () => expect(compress(c.input, c.role, cfg).text).toBe(c.output));
+  }
 });

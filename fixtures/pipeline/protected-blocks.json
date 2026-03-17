@@ -1,1 +1,42 @@
-[]
+[
+  {
+    "id": "noop-arabic",
+    "description": "passes through Arabic text unchanged",
+    "role": "assistant",
+    "tiers": ["rules"],
+    "input": "مرحبا، كيف حالك؟",
+    "output": "مرحبا، كيف حالك؟"
+  },
+  {
+    "id": "noop-chinese",
+    "description": "passes through Chinese text unchanged",
+    "role": "assistant",
+    "tiers": ["rules"],
+    "input": "你好，请问有什么可以帮助你的吗？",
+    "output": "你好，请问有什么可以帮助你的吗？"
+  },
+  {
+    "id": "noop-japanese",
+    "description": "passes through Japanese text unchanged",
+    "role": "assistant",
+    "tiers": ["rules"],
+    "input": "もちろんです！お役に立てて光栄です。",
+    "output": "もちろんです！お役に立てて光栄です。"
+  },
+  {
+    "id": "noop-ukrainian",
+    "description": "passes through Ukrainian (Cyrillic) text unchanged",
+    "role": "assistant",
+    "tiers": ["rules"],
+    "input": "Звичайно! Ось відповідь на ваше запитання.",
+    "output": "Звичайно! Ось відповідь на ваше запитання."
+  },
+  {
+    "id": "polish-passthrough",
+    "description": "Polish (Latin + diacritics) passes Latin check, no rules fire, returns unchanged",
+    "role": "assistant",
+    "tiers": ["rules"],
+    "input": "Oczywiście! Chętnie Ci pomogę. Mam nadzieję, że to pomoże!",
+    "output": "Oczywiście! Chętnie Ci pomogę. Mam nadzieję, że to pomoże!"
+  }
+]

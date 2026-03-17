@@ -40,7 +40,11 @@ export function runCompress(
 ): CompressResult {
   const { tiers, tokenMethod } = config;
 
-  const originalTokens     = estimateTokens(text, tokenMethod);
+  const originalTokens = estimateTokens(text, tokenMethod);
+
+  // Fast bail-out: no Latin characters → not English, nothing to compress
+  if (!/[a-zA-Z]/.test(text)) return { text, originalTokens, compressedTokens: originalTokens, savedTokens: 0, savedPercent: 0 };
+
   const { masked, blocks } = maskProtected(text);
 
   let result = masked;

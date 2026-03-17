@@ -82,6 +82,11 @@ fn apply_tier(text: &str, role: &str, tier: &Tier) -> Result<String, String> {
 pub fn run_compress(text: &str, role: &str, config: &CompressConfig) -> Result<CompressResult, String> {
     let original_tokens = estimate_tokens(text, &config.token_method)?;
 
+    // Fast bail-out: no Latin characters → not English, nothing to compress
+    if !text.chars().any(|c| c.is_ascii_alphabetic()) {
+        return Ok(CompressResult { text: text.to_string(), original_tokens, compressed_tokens: original_tokens, saved_tokens: 0, saved_percent: 0 });
+    }
+
     let MaskedText { masked, blocks } = mask_protected(text);
     let mut result = masked;
 
