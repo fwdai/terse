@@ -11,6 +11,20 @@ Strip boilerplate from LLM conversation history before sending it back to the mo
   30 tokens → 12 tokens  (-60%)
 ```
 
+## Install
+
+**curl (macOS and Linux):**
+```sh
+curl -fsSL https://raw.githubusercontent.com/fwdai/terse/main/install.sh | bash
+```
+
+**cargo:**
+```sh
+cargo install terse-rs
+```
+
+**Manual:** download a pre-built binary from [Releases](https://github.com/fwdai/terse/releases), extract, and place `terse` on your `$PATH`.
+
 ## Packages
 
 | Package | Language | Description |

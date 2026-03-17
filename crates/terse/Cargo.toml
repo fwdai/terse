@@ -1,5 +1,5 @@
 [package]
-name = "terse"
+name = "terse-rs"
 version = "0.1.0"
 edition = "2021"
 description = "Token compressor for LLM conversation history"
