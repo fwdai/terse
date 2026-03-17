@@ -1,0 +1,114 @@
+[
+  {
+    "id": "removes-filler-sentence-start",
+    "description": "removes filler at sentence start",
+    "role": "assistant",
+    "tiers": ["rules"],
+    "input": "Basically, this is how it works.",
+    "output": "this is how it works."
+  },
+  {
+    "id": "removes-filler-after-sentence-boundary",
+    "description": "removes filler after sentence boundary",
+    "role": "assistant",
+    "tiers": ["rules"],
+    "input": "First point. Basically, the cache is warm.",
+    "output": "First point. the cache is warm."
+  },
+  {
+    "id": "preserves-filler-mid-sentence",
+    "description": "does NOT remove filler mid-sentence",
+    "role": "assistant",
+    "tiers": ["rules"],
+    "input": "She basically ignored the warning.",
+    "output": "She basically ignored the warning."
+  },
+  {
+    "id": "preserves-clearly-adjective",
+    "description": "does NOT remove \"clearly\" when it is an adjective",
+    "role": "assistant",
+    "tiers": ["rules"],
+    "input": "The code is clearly wrong.",
+    "output": "The code is clearly wrong."
+  },
+  {
+    "id": "removes-actually",
+    "description": "removes \"actually\"",
+    "role": "assistant",
+    "tiers": ["rules"],
+    "input": "Actually, the bug is in the parser.",
+    "output": "the bug is in the parser."
+  },
+  {
+    "id": "removes-frankly",
+    "description": "removes \"frankly\"",
+    "role": "assistant",
+    "tiers": ["rules"],
+    "input": "Frankly, this approach will not scale.",
+    "output": "this approach will not scale."
+  },
+  {
+    "id": "removes-unfortunately",
+    "description": "removes \"unfortunately\"",
+    "role": "assistant",
+    "tiers": ["rules"],
+    "input": "Unfortunately, there is no built-in way to do this.",
+    "output": "there is no built-in way to do this."
+  },
+  {
+    "id": "removes-importantly",
+    "description": "removes \"importantly\"",
+    "role": "assistant",
+    "tiers": ["rules"],
+    "input": "Importantly, the tests still pass.",
+    "output": "the tests still pass."
+  },
+  {
+    "id": "removes-notably",
+    "description": "removes \"notably\"",
+    "role": "assistant",
+    "tiers": ["rules"],
+    "input": "Notably, this only affects Windows.",
+    "output": "this only affects Windows."
+  },
+  {
+    "id": "removes-interestingly",
+    "description": "removes \"interestingly\"",
+    "role": "assistant",
+    "tiers": ["rules"],
+    "input": "Interestingly, the slower algorithm wins here.",
+    "output": "the slower algorithm wins here."
+  },
+  {
+    "id": "removes-of-course",
+    "description": "removes \"of course\" phrase",
+    "role": "assistant",
+    "tiers": ["rules"],
+    "input": "Of course, you need to restart the server.",
+    "output": "You need to restart the server."
+  },
+  {
+    "id": "removes-certainly",
+    "description": "removes \"certainly\"",
+    "role": "assistant",
+    "tiers": ["rules"],
+    "input": "Certainly, that is one valid approach.",
+    "output": "That is one valid approach."
+  },
+  {
+    "id": "preserves-theoretically",
+    "description": "does NOT remove \"theoretically\" — qualifies the claim",
+    "role": "assistant",
+    "tiers": ["rules"],
+    "input": "Theoretically, this should work.",
+    "output": "Theoretically, this should work."
+  },
+  {
+    "id": "preserves-technically",
+    "description": "does NOT remove \"technically\" — qualifies the claim",
+    "role": "assistant",
+    "tiers": ["rules"],
+    "input": "Technically, this is correct.",
+    "output": "Technically, this is correct."
+  }
+]

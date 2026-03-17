@@ -11,6 +11,23 @@ Strip boilerplate from LLM conversation history before sending it back to the mo
   30 tokens → 12 tokens  (-60%)
 ```
 
+## Packages
+
+| Package | Language | Description |
+|---------|----------|-------------|
+| [`packages/terse`](packages/terse/) | TypeScript (Bun) | npm library + CLI |
+| [`crates/terse`](crates/terse/) | Rust | library + binary |
+
+Shared test fixtures live in [`fixtures/`](fixtures/) — both implementations are verified against the same cases.
+
+## Testing
+
+```sh
+make test        # run both suites
+make test-ts     # TypeScript only (bun test)
+make test-rust   # Rust only (cargo test)
+```
+
 ## What it does
 
 LLM conversations accumulate filler: opener affirmations (*Certainly! Great question!*), closer offers (*Let me know if you have any questions*), verbose phrasing (*due to the fact that* → *because*), and structural announcements (*Here is the solution:*). None of this helps the model on the next turn.
@@ -22,53 +39,10 @@ Terse removes it — deterministically, in microseconds, with no external calls.
 | Tier | What it does | Requires |
 |------|-------------|---------|
 | `rules` | Regex patterns: boilerplate openers/closers, phrase substitutions, filler words, structural labels | nothing |
-| `nlp` | POS-aware: drop articles, shorten synonyms (*utilize → use*, *repository → repo*) | `bun add compromise` |
+| `nlp` | POS-aware: drop articles, shorten synonyms (*utilize → use*, *repository → repo*) | `bun add compromise` (TS) |
 | `llm` | Semantic rewrite via local model | planned |
 
 Code blocks, inline code, and URLs are never touched.
-
-## Install
-
-```sh
-bun add terse
-```
-
-## API
-
-```ts
-import { compress, compressHistory, TIERS } from 'terse';
-
-// Single message
-const { text, savedPercent } = compress(
-  "Certainly! I'd be happy to help with that.",
-  'assistant',
-);
-// → { text: "Help with that.", savedPercent: 62 }
-
-// Full conversation history
-const { messages, stats } = compressHistory(messages, {
-  tiers: [TIERS.RULES, TIERS.NLP],
-  tokenMethod: 'chars',  // 'chars': fast, ~±20% | 'tiktoken': exact for GPT, proxy for Claude (±5-10%)
-});
-// messages[n]._stats — per-message savings
-// stats.totalSavedPercent — aggregate
-```
-
-## CLI
-
-```sh
-# Stdin
-echo "Certainly! I hope this helps!" | bun bin/cli.ts
-
-# With diff output
-echo "Could you please explain closures? Thank you!" | bun bin/cli.ts --role user --diff
-
-# Compress a history JSON file
-bun bin/cli.ts history.json --tiers rules,nlp
-
-# Accurate token counts (GPT-4 exact; good proxy for Claude)
-echo "some text" | bun bin/cli.ts --tokens tiktoken
-```
 
 ## Typical savings
 

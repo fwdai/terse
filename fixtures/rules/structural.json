@@ -1,0 +1,346 @@
+[
+  {
+    "id": "strips-here-is-x",
+    "description": "strips \"Here is X:\"",
+    "role": "assistant",
+    "tiers": ["rules"],
+    "input": "Here is the solution: use a hash map.",
+    "output": "Use a hash map."
+  },
+  {
+    "id": "strips-heres-x",
+    "description": "strips \"Here's X:\"",
+    "role": "assistant",
+    "tiers": ["rules"],
+    "input": "Here's what you need: install the package.",
+    "output": "Install the package."
+  },
+  {
+    "id": "strips-here-are-x",
+    "description": "strips \"Here are X:\"",
+    "role": "assistant",
+    "tiers": ["rules"],
+    "input": "Here are the steps: clone, install, run.",
+    "output": "Clone, install, run."
+  },
+  {
+    "id": "strips-below-is-x",
+    "description": "strips \"Below is X:\"",
+    "role": "assistant",
+    "tiers": ["rules"],
+    "input": "Below is an example: update the config.",
+    "output": "Update the config."
+  },
+  {
+    "id": "strips-below-are-x",
+    "description": "strips \"Below are X:\"",
+    "role": "assistant",
+    "tiers": ["rules"],
+    "input": "Below are the results: 3 passed, 0 failed.",
+    "output": "3 passed, 0 failed."
+  },
+  {
+    "id": "strips-the-following-x",
+    "description": "strips \"The following X:\"",
+    "role": "assistant",
+    "tiers": ["rules"],
+    "input": "The following code fixes the bug: check the null case.",
+    "output": "Check the null case."
+  },
+  {
+    "id": "strips-the-following-is-x",
+    "description": "strips \"The following is X:\"",
+    "role": "assistant",
+    "tiers": ["rules"],
+    "input": "The following is a list of options: A, B, C.",
+    "output": "A, B, C."
+  },
+  {
+    "id": "strips-ive-outlined-x",
+    "description": "strips \"I've outlined X:\"",
+    "role": "assistant",
+    "tiers": ["rules"],
+    "input": "I've outlined the changes below: remove the loop.",
+    "output": "Remove the loop."
+  },
+  {
+    "id": "strips-i-have-described-x",
+    "description": "strips \"I have described X:\"",
+    "role": "assistant",
+    "tiers": ["rules"],
+    "input": "I have described the fix above: update the config.",
+    "output": "Update the config."
+  },
+  {
+    "id": "preserves-no-colon",
+    "description": "does NOT strip when no colon — \"Here is an example.\"",
+    "role": "assistant",
+    "tiers": ["rules"],
+    "input": "Here is an example.",
+    "output": "Here is an example."
+  },
+  {
+    "id": "strips-mid-text-after-sentence-boundary",
+    "description": "strips mid-text after sentence boundary",
+    "role": "assistant",
+    "tiers": ["rules"],
+    "input": "The bug is confirmed. Here is the fix: delete line 42.",
+    "output": "The bug is confirmed. delete line 42."
+  },
+  {
+    "id": "not-applied-to-user-turns",
+    "description": "is not applied to user turns",
+    "role": "user",
+    "tiers": ["rules"],
+    "input": "Here is my code: const x = 1;",
+    "output": "Here is my code: const x = 1;"
+  },
+  {
+    "id": "strips-to-summarize",
+    "description": "strips \"To summarize, \"",
+    "role": "assistant",
+    "tiers": ["rules"],
+    "input": "To summarize, the fix is on line 42.",
+    "output": "The fix is on line 42."
+  },
+  {
+    "id": "strips-in-summary",
+    "description": "strips \"In summary:\"",
+    "role": "assistant",
+    "tiers": ["rules"],
+    "input": "In summary: use a cache.",
+    "output": "Use a cache."
+  },
+  {
+    "id": "strips-in-conclusion",
+    "description": "strips \"In conclusion,\"",
+    "role": "assistant",
+    "tiers": ["rules"],
+    "input": "In conclusion, avoid globals.",
+    "output": "Avoid globals."
+  },
+  {
+    "id": "strips-to-conclude",
+    "description": "strips \"To conclude:\"",
+    "role": "assistant",
+    "tiers": ["rules"],
+    "input": "To conclude: always write tests.",
+    "output": "Always write tests."
+  },
+  {
+    "id": "strips-to-recap",
+    "description": "strips \"To recap,\"",
+    "role": "assistant",
+    "tiers": ["rules"],
+    "input": "To recap, we removed the N+1 query.",
+    "output": "We removed the N+1 query."
+  },
+  {
+    "id": "strips-to-sum-up",
+    "description": "strips \"To sum up:\"",
+    "role": "assistant",
+    "tiers": ["rules"],
+    "input": "To sum up: three bugs were fixed.",
+    "output": "Three bugs were fixed."
+  },
+  {
+    "id": "strips-in-short",
+    "description": "strips \"In short,\"",
+    "role": "assistant",
+    "tiers": ["rules"],
+    "input": "In short, the loop is O(n).",
+    "output": "The loop is O(n)."
+  },
+  {
+    "id": "strips-in-brief",
+    "description": "strips \"In brief:\"",
+    "role": "assistant",
+    "tiers": ["rules"],
+    "input": "In brief: deploy the patch.",
+    "output": "Deploy the patch."
+  },
+  {
+    "id": "strips-in-closing",
+    "description": "strips \"In closing,\"",
+    "role": "assistant",
+    "tiers": ["rules"],
+    "input": "In closing, good luck with the refactor.",
+    "output": "Good luck with the refactor."
+  },
+  {
+    "id": "strips-to-wrap-up",
+    "description": "strips \"To wrap up:\"",
+    "role": "assistant",
+    "tiers": ["rules"],
+    "input": "To wrap up: the PR is ready to merge.",
+    "output": "The PR is ready to merge."
+  },
+  {
+    "id": "preserves-in-short-mid-sentence",
+    "description": "does NOT strip \"in short\" mid-sentence",
+    "role": "assistant",
+    "tiers": ["rules"],
+    "input": "He explained it in short form.",
+    "output": "He explained it in short form."
+  },
+  {
+    "id": "strips-to-begin",
+    "description": "strips \"To begin,\"",
+    "role": "assistant",
+    "tiers": ["rules"],
+    "input": "To begin, set up your environment.",
+    "output": "Set up your environment."
+  },
+  {
+    "id": "strips-to-start",
+    "description": "strips \"To start:\"",
+    "role": "assistant",
+    "tiers": ["rules"],
+    "input": "To start: install the dependencies.",
+    "output": "Install the dependencies."
+  },
+  {
+    "id": "strips-to-start-with",
+    "description": "strips \"To start with,\"",
+    "role": "assistant",
+    "tiers": ["rules"],
+    "input": "To start with, understand the data model.",
+    "output": "Understand the data model."
+  },
+  {
+    "id": "strips-to-begin-with",
+    "description": "strips \"To begin with:\"",
+    "role": "assistant",
+    "tiers": ["rules"],
+    "input": "To begin with: run the migrations.",
+    "output": "Run the migrations."
+  },
+  {
+    "id": "strips-first-things-first",
+    "description": "strips \"First things first:\"",
+    "role": "assistant",
+    "tiers": ["rules"],
+    "input": "First things first: back up the database.",
+    "output": "Back up the database."
+  },
+  {
+    "id": "preserves-to-begin-without-separator",
+    "description": "does NOT strip \"To begin\" without comma/colon",
+    "role": "assistant",
+    "tiers": ["rules"],
+    "input": "To begin the process, open the terminal.",
+    "output": "To begin the process, open the terminal."
+  },
+  {
+    "id": "preserves-to-start-without-separator",
+    "description": "does NOT strip \"To start\" without comma/colon",
+    "role": "assistant",
+    "tiers": ["rules"],
+    "input": "To start the server, run npm start.",
+    "output": "To start the server, run npm start."
+  },
+  {
+    "id": "strips-to-explain",
+    "description": "strips \"To explain:\"",
+    "role": "assistant",
+    "tiers": ["rules"],
+    "input": "To explain: closures capture their enclosing scope.",
+    "output": "Closures capture their enclosing scope."
+  },
+  {
+    "id": "strips-to-clarify",
+    "description": "strips \"To clarify,\"",
+    "role": "assistant",
+    "tiers": ["rules"],
+    "input": "To clarify, the error only occurs on write.",
+    "output": "The error only occurs on write."
+  },
+  {
+    "id": "strips-to-illustrate",
+    "description": "strips \"To illustrate:\"",
+    "role": "assistant",
+    "tiers": ["rules"],
+    "input": "To illustrate: consider a sorted array.",
+    "output": "Consider a sorted array."
+  },
+  {
+    "id": "preserves-to-clarify-without-separator",
+    "description": "does NOT strip \"To clarify\" without comma/colon",
+    "role": "assistant",
+    "tiers": ["rules"],
+    "input": "To clarify the confusion, read the docs.",
+    "output": "To clarify the confusion, read the docs."
+  },
+  {
+    "id": "strips-put-differently",
+    "description": "strips \"Put differently,\"",
+    "role": "assistant",
+    "tiers": ["rules"],
+    "input": "Put differently, the function is not pure.",
+    "output": "The function is not pure."
+  },
+  {
+    "id": "strips-put-simply",
+    "description": "strips \"Put simply:\"",
+    "role": "assistant",
+    "tiers": ["rules"],
+    "input": "Put simply: the cache is cold.",
+    "output": "The cache is cold."
+  },
+  {
+    "id": "strips-simply-put",
+    "description": "strips \"Simply put,\"",
+    "role": "assistant",
+    "tiers": ["rules"],
+    "input": "Simply put, the tests are broken.",
+    "output": "The tests are broken."
+  },
+  {
+    "id": "strips-tldr",
+    "description": "strips \"TL;DR:\"",
+    "role": "assistant",
+    "tiers": ["rules"],
+    "input": "TL;DR: the fix is on line 42.",
+    "output": "The fix is on line 42."
+  },
+  {
+    "id": "strips-bottom-line",
+    "description": "strips \"Bottom line:\"",
+    "role": "assistant",
+    "tiers": ["rules"],
+    "input": "Bottom line: use indexes.",
+    "output": "Use indexes."
+  },
+  {
+    "id": "strips-note-colon",
+    "description": "strips \"Note:\"",
+    "role": "assistant",
+    "tiers": ["rules"],
+    "input": "Note: this only affects Windows.",
+    "output": "This only affects Windows."
+  },
+  {
+    "id": "strips-key-takeaway",
+    "description": "strips \"Key takeaway:\"",
+    "role": "assistant",
+    "tiers": ["rules"],
+    "input": "Key takeaway: always validate input.",
+    "output": "Always validate input."
+  },
+  {
+    "id": "strips-key-takeaways",
+    "description": "strips \"Key takeaways:\"",
+    "role": "assistant",
+    "tiers": ["rules"],
+    "input": "Key takeaways: test, document, review.",
+    "output": "Test, document, review."
+  },
+  {
+    "id": "preserves-note-without-colon",
+    "description": "does NOT strip \"Note\" without colon/comma",
+    "role": "assistant",
+    "tiers": ["rules"],
+    "input": "Note the performance implications carefully.",
+    "output": "Note the performance implications carefully."
+  }
+]

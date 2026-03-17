@@ -1,0 +1,82 @@
+[
+  {
+    "id": "drops-the",
+    "description": "drops \"the\" before common nouns",
+    "role": "assistant",
+    "tiers": ["nlp"],
+    "input": "The function returns null.",
+    "output": "function returns null."
+  },
+  {
+    "id": "drops-a",
+    "description": "drops \"a\" before common nouns",
+    "role": "assistant",
+    "tiers": ["nlp"],
+    "input": "Use a hash map for lookups.",
+    "output": "Use hash map for lookups."
+  },
+  {
+    "id": "drops-an",
+    "description": "drops \"an\" before vowel-initial nouns",
+    "role": "assistant",
+    "tiers": ["nlp"],
+    "input": "Create an instance of the class.",
+    "output": "Create instance of class."
+  },
+  {
+    "id": "verb-utilize",
+    "description": "verb: utilize → use (demonstratives like \"this\" are kept)",
+    "role": "assistant",
+    "tiers": ["nlp"],
+    "input": "We should utilize this approach.",
+    "output": "We should use this approach."
+  },
+  {
+    "id": "verb-attempt",
+    "description": "verb: attempt → try",
+    "role": "assistant",
+    "tiers": ["nlp"],
+    "input": "The system will attempt to reconnect.",
+    "output": "system will try to reconnect."
+  },
+  {
+    "id": "verb-obtain",
+    "description": "verb: obtain → get",
+    "role": "assistant",
+    "tiers": ["nlp"],
+    "input": "You can obtain the token from the header.",
+    "output": "You can get token from header."
+  },
+  {
+    "id": "verb-demonstrate",
+    "description": "verb: demonstrate → show",
+    "role": "assistant",
+    "tiers": ["nlp"],
+    "input": "This example will demonstrate the pattern.",
+    "output": "This example will show pattern."
+  },
+  {
+    "id": "noun-repository",
+    "description": "noun: repository → repo",
+    "role": "assistant",
+    "tiers": ["nlp"],
+    "input": "Clone the repository first.",
+    "output": "Clone repo first."
+  },
+  {
+    "id": "noun-documentation",
+    "description": "noun: documentation → docs",
+    "role": "assistant",
+    "tiers": ["nlp"],
+    "input": "Check the documentation for details.",
+    "output": "Check docs for details."
+  },
+  {
+    "id": "noun-configuration",
+    "description": "noun: configuration → config",
+    "role": "assistant",
+    "tiers": ["nlp"],
+    "input": "Update the configuration file.",
+    "output": "Update config file."
+  }
+]

@@ -1,0 +1,354 @@
+[
+  {
+    "id": "removes-certainly",
+    "description": "removes \"Certainly!\"",
+    "role": "assistant",
+    "tiers": ["rules"],
+    "input": "Certainly! Here is the answer.",
+    "output": "Here is the answer."
+  },
+  {
+    "id": "removes-sure",
+    "description": "removes \"Sure,\"",
+    "role": "assistant",
+    "tiers": ["rules"],
+    "input": "Sure, here is what you need.",
+    "output": "Here is what you need."
+  },
+  {
+    "id": "removes-great-question",
+    "description": "removes \"Great question!\"",
+    "role": "assistant",
+    "tiers": ["rules"],
+    "input": "Great question! Let's explore this.",
+    "output": "Let's explore this."
+  },
+  {
+    "id": "removes-id-be-happy-to-help",
+    "description": "removes \"I'd be happy to help\"",
+    "role": "assistant",
+    "tiers": ["rules"],
+    "input": "I'd be happy to help. Here is the answer.",
+    "output": "Here is the answer."
+  },
+  {
+    "id": "removes-im-glad-to-assist",
+    "description": "removes \"I'm glad to assist\"",
+    "role": "assistant",
+    "tiers": ["rules"],
+    "input": "I'm glad to assist. Here's what I found.",
+    "output": "Here's what I found."
+  },
+  {
+    "id": "removes-as-an-ai-language-model",
+    "description": "removes \"As an AI language model\"",
+    "role": "assistant",
+    "tiers": ["rules"],
+    "input": "As an AI language model, I cannot browse the web.",
+    "output": "I cannot browse the web."
+  },
+  {
+    "id": "removes-thank-you-for-your-question",
+    "description": "removes \"Thank you for your question\"",
+    "role": "assistant",
+    "tiers": ["rules"],
+    "input": "Thank you for your question. The answer is 42.",
+    "output": "The answer is 42."
+  },
+  {
+    "id": "removes-no-problem",
+    "description": "removes \"No problem!\"",
+    "role": "assistant",
+    "tiers": ["rules"],
+    "input": "No problem! Here is how to fix it.",
+    "output": "Here is how to fix it."
+  },
+  {
+    "id": "removes-got-it",
+    "description": "removes \"Got it.\"",
+    "role": "assistant",
+    "tiers": ["rules"],
+    "input": "Got it. Here is the updated version.",
+    "output": "Here is the updated version."
+  },
+  {
+    "id": "removes-understood",
+    "description": "removes \"Understood.\"",
+    "role": "assistant",
+    "tiers": ["rules"],
+    "input": "Understood. I will avoid globals.",
+    "output": "I will avoid globals."
+  },
+  {
+    "id": "removes-perfect",
+    "description": "removes \"Perfect!\"",
+    "role": "assistant",
+    "tiers": ["rules"],
+    "input": "Perfect! That is the right approach.",
+    "output": "That is the right approach."
+  },
+  {
+    "id": "removes-i-understand",
+    "description": "removes \"I understand.\"",
+    "role": "assistant",
+    "tiers": ["rules"],
+    "input": "I understand. The issue is in the parser.",
+    "output": "The issue is in the parser."
+  },
+  {
+    "id": "removes-i-understand-what-youre-asking",
+    "description": "removes \"I understand what you're asking.\"",
+    "role": "assistant",
+    "tiers": ["rules"],
+    "input": "I understand what you're asking. The answer is 42.",
+    "output": "The answer is 42."
+  },
+  {
+    "id": "removes-i-see-what-you-mean",
+    "description": "removes \"I see what you mean.\"",
+    "role": "assistant",
+    "tiers": ["rules"],
+    "input": "I see what you mean. The loop is off by one.",
+    "output": "The loop is off by one."
+  },
+  {
+    "id": "removes-that-makes-sense",
+    "description": "removes \"That makes sense.\"",
+    "role": "assistant",
+    "tiers": ["rules"],
+    "input": "That makes sense. Here is a better approach.",
+    "output": "Here is a better approach."
+  },
+  {
+    "id": "removes-youre-absolutely-right",
+    "description": "removes \"You're absolutely right.\"",
+    "role": "assistant",
+    "tiers": ["rules"],
+    "input": "You're absolutely right. We should use a set instead.",
+    "output": "We should use a set instead."
+  },
+  {
+    "id": "removes-let-me-help-you-with-that",
+    "description": "removes \"Let me help you with that.\"",
+    "role": "assistant",
+    "tiers": ["rules"],
+    "input": "Let me help you with that. The fix is on line 5.",
+    "output": "The fix is on line 5."
+  },
+  {
+    "id": "removes-let-me-walk-you-through-this",
+    "description": "removes \"Let me walk you through this.\"",
+    "role": "assistant",
+    "tiers": ["rules"],
+    "input": "Let me walk you through this. First, install the deps.",
+    "output": "First, install the deps."
+  },
+  {
+    "id": "removes-let-me-explain",
+    "description": "removes \"Let me explain.\"",
+    "role": "assistant",
+    "tiers": ["rules"],
+    "input": "Let me explain. Closures capture variables by reference.",
+    "output": "Closures capture variables by reference."
+  },
+  {
+    "id": "removes-let-me-break-this-down",
+    "description": "removes \"Let me break this down.\"",
+    "role": "assistant",
+    "tiers": ["rules"],
+    "input": "Let me break this down. There are three steps.",
+    "output": "There are three steps."
+  },
+  {
+    "id": "removes-ill-help-you-with-that",
+    "description": "removes \"I'll help you with that.\"",
+    "role": "assistant",
+    "tiers": ["rules"],
+    "input": "I'll help you with that. Here is the updated code.",
+    "output": "Here is the updated code."
+  },
+  {
+    "id": "removes-i-can-help",
+    "description": "removes \"I can help.\"",
+    "role": "assistant",
+    "tiers": ["rules"],
+    "input": "I can help. The problem is a missing null check.",
+    "output": "The problem is a missing null check."
+  },
+  {
+    "id": "removes-based-on-what-youve-described",
+    "description": "removes \"Based on what you've described,\"",
+    "role": "assistant",
+    "tiers": ["rules"],
+    "input": "Based on what you've described, the issue is a race condition.",
+    "output": "The issue is a race condition."
+  },
+  {
+    "id": "removes-looking-at-your-code",
+    "description": "removes \"Looking at your code,\"",
+    "role": "assistant",
+    "tiers": ["rules"],
+    "input": "Looking at your code, the loop runs one extra time.",
+    "output": "The loop runs one extra time."
+  },
+  {
+    "id": "removes-to-answer-your-question",
+    "description": "removes \"To answer your question,\"",
+    "role": "assistant",
+    "tiers": ["rules"],
+    "input": "To answer your question, yes it is safe to call this twice.",
+    "output": "Yes it is safe to call this twice."
+  },
+  {
+    "id": "preserves-substantive-i-understand",
+    "description": "does NOT strip \"I understand Rust's ownership model\" — substantive",
+    "role": "assistant",
+    "tiers": ["rules"],
+    "input": "I understand Rust's ownership model. It ensures memory safety.",
+    "output": "I understand Rust's ownership model. It ensures memory safety."
+  },
+  {
+    "id": "removes-i-hope-this-helps",
+    "description": "removes \"I hope this helps!\"",
+    "role": "assistant",
+    "tiers": ["rules"],
+    "input": "The answer is 42. I hope this helps!",
+    "output": "The answer is 42."
+  },
+  {
+    "id": "removes-let-me-know-if-you-have-any-questions",
+    "description": "removes \"Let me know if you have any questions.\"",
+    "role": "assistant",
+    "tiers": ["rules"],
+    "input": "Use recursion here. Let me know if you have any questions.",
+    "output": "Use recursion here."
+  },
+  {
+    "id": "removes-feel-free-to-ask",
+    "description": "removes \"Feel free to ask\"",
+    "role": "assistant",
+    "tiers": ["rules"],
+    "input": "That covers the basics. Feel free to ask if you need more details.",
+    "output": "That covers the basics."
+  },
+  {
+    "id": "removes-is-there-anything-else",
+    "description": "removes \"Is there anything else\"",
+    "role": "assistant",
+    "tiers": ["rules"],
+    "input": "Done. Is there anything else I can help you with?",
+    "output": "Done."
+  },
+  {
+    "id": "removes-does-that-make-sense",
+    "description": "removes \"Does that make sense?\"",
+    "role": "assistant",
+    "tiers": ["rules"],
+    "input": "Use an index on the foreign key. Does that make sense?",
+    "output": "Use an index on the foreign key."
+  },
+  {
+    "id": "removes-does-this-help",
+    "description": "removes \"Does this help?\"",
+    "role": "assistant",
+    "tiers": ["rules"],
+    "input": "Set the timeout to 30s. Does this help?",
+    "output": "Set the timeout to 30s."
+  },
+  {
+    "id": "removes-hope-that-makes-sense",
+    "description": "removes \"Hope that makes sense!\"",
+    "role": "assistant",
+    "tiers": ["rules"],
+    "input": "The closure captures x by reference. Hope that makes sense!",
+    "output": "The closure captures x by reference."
+  },
+  {
+    "id": "removes-that-should-do-it",
+    "description": "removes \"That should do it!\"",
+    "role": "assistant",
+    "tiers": ["rules"],
+    "input": "Add a null check on line 5. That should do it!",
+    "output": "Add a null check on line 5."
+  },
+  {
+    "id": "removes-give-that-a-try",
+    "description": "removes \"Give that a try!\"",
+    "role": "assistant",
+    "tiers": ["rules"],
+    "input": "Run npm install first. Give that a try!",
+    "output": "Run npm install first."
+  },
+  {
+    "id": "removes-shall-i-proceed",
+    "description": "removes \"Shall I proceed?\"",
+    "role": "assistant",
+    "tiers": ["rules"],
+    "input": "I can refactor the whole module. Shall I proceed?",
+    "output": "I can refactor the whole module."
+  },
+  {
+    "id": "removes-let-me-know-your-thoughts",
+    "description": "removes \"Let me know your thoughts.\"",
+    "role": "assistant",
+    "tiers": ["rules"],
+    "input": "Use a trie for prefix lookups. Let me know your thoughts.",
+    "output": "Use a trie for prefix lookups."
+  },
+  {
+    "id": "removes-let-me-know-how-it-goes",
+    "description": "removes \"Let me know how it goes.\"",
+    "role": "assistant",
+    "tiers": ["rules"],
+    "input": "Restart the service. Let me know how it goes.",
+    "output": "Restart the service."
+  },
+  {
+    "id": "removes-let-me-know-if-that-works",
+    "description": "removes \"Let me know if that works.\"",
+    "role": "assistant",
+    "tiers": ["rules"],
+    "input": "Add a null check. Let me know if that works.",
+    "output": "Add a null check."
+  },
+  {
+    "id": "removes-feel-free-to-reach-out",
+    "description": "removes \"Feel free to reach out.\"",
+    "role": "assistant",
+    "tiers": ["rules"],
+    "input": "That covers the basics. Feel free to reach out.",
+    "output": "That covers the basics."
+  },
+  {
+    "id": "removes-if-you-have-any-questions-just-ask",
+    "description": "removes \"If you have any questions, just ask.\"",
+    "role": "assistant",
+    "tiers": ["rules"],
+    "input": "The fix is straightforward. If you have any questions, just ask.",
+    "output": "The fix is straightforward."
+  },
+  {
+    "id": "removes-happy-to-help-further",
+    "description": "removes \"Happy to help further!\"",
+    "role": "assistant",
+    "tiers": ["rules"],
+    "input": "That should resolve the issue. Happy to help further!",
+    "output": "That should resolve the issue."
+  },
+  {
+    "id": "removes-hope-this-clarifies-things",
+    "description": "removes \"Hope this clarifies things.\"",
+    "role": "assistant",
+    "tiers": ["rules"],
+    "input": "Closures capture variables by reference. Hope this clarifies things.",
+    "output": "Closures capture variables by reference."
+  },
+  {
+    "id": "removes-opener-and-closer-together",
+    "description": "removes opener and closer together",
+    "role": "assistant",
+    "tiers": ["rules"],
+    "input": "Certainly! The answer is 42. I hope this helps!",
+    "output": "The answer is 42."
+  }
+]

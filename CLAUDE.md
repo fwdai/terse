@@ -2,6 +2,20 @@
 
 Tool that reduces token usage in LLM conversation history by removing unnecessary tokens from past messages. Target: machine reader (the model), not humans — output doesn't need to be readable.
 
+## Monorepo
+
+```
+packages/terse/   ← TypeScript library (npm, Bun)
+crates/terse/     ← Rust port (library + CLI binary)
+fixtures/         ← shared cross-language test cases (JSON)
+```
+
+- New compression rule → implement in **both** packages, add fixture cases to `fixtures/`
+- `make test` runs both suites (`bun test` + `cargo test`)
+- `evals/` lives inside `packages/terse/`, is TS-only
+- Fixture schema: `{ id, description, role, tiers, input, output }` — always `tokenMethod: "chars"`
+- Fixture failures in Rust mean Rust diverges from TS reference — fix Rust, not the fixture
+
 ## Stack
 
 **Runtime:** Bun. Run everything with `bun`, not `node`.
@@ -10,38 +24,44 @@ Tool that reduces token usage in LLM conversation history by removing unnecessar
 ## File structure
 
 ```
-src/
-  index.ts                  ← public API only (compress, compressHistory) — keep thin
-  types.ts                  ← all TS interfaces and type aliases
-  config.ts                 ← TIERS constant, DEFAULT_CONFIG
-  tokens.ts                 ← estimateTokens, gptEncode lazy load
-  pipeline.ts               ← maskProtected, unmaskProtected, TIER_FNS, runCompress/runCompressHistory
-  tiers/
-    rules/
-      index.ts              ← applyRules() — orchestrates sub-passes in order
-      assistant.ts          ← ASSISTANT_OPENERS/CLOSERS + removeAssistantBoilerplate
-      structural.ts         ← STRUCTURAL patterns + removeStructuralMetaCommentary
-      user.ts               ← USER_OPENERS/CLOSERS + removeUserBoilerplate
-      substitutions.ts      ← SUBSTITUTIONS vocab + applySubstitutions
-      fillers.ts            ← SENTENCE_START_FILLERS + removeFillers
-      whitespace.ts         ← normalizeWhitespace
-    nlp/
-      index.ts              ← applyNlp(), nlp lazy load
-      vocab.ts              ← VERB_SYNONYMS, NOUN_SYNONYMS, INTENSIFIERS
-    llm/
-      index.ts              ← applyLlm() stub + planned techniques
-bin/
-  cli.ts                    ← CLI entry point
-tests/
-  index.test.ts             ← bun test (79 tests)
+packages/terse/
+  src/
+    index.ts                ← public API only (compress, compressHistory) — keep thin
+    types.ts                ← all TS interfaces and type aliases
+    config.ts               ← TIERS constant, DEFAULT_CONFIG
+    tokens.ts               ← estimateTokens, gptEncode lazy load
+    pipeline.ts             ← maskProtected, unmaskProtected, TIER_FNS, runCompress/runCompressHistory
+    tiers/
+      rules/
+        index.ts            ← applyRules() — orchestrates sub-passes in order
+        assistant.ts        ← ASSISTANT_OPENERS/CLOSERS + removeAssistantBoilerplate
+        structural.ts       ← STRUCTURAL patterns + removeStructuralMetaCommentary
+        user.ts             ← USER_OPENERS/CLOSERS + removeUserBoilerplate
+        substitutions.ts    ← SUBSTITUTIONS vocab + applySubstitutions
+        fillers.ts          ← SENTENCE_START_FILLERS + removeFillers
+        whitespace.ts       ← normalizeWhitespace
+      nlp/
+        index.ts            ← applyNlp(), nlp lazy load
+        vocab.ts            ← VERB_SYNONYMS, NOUN_SYNONYMS, INTENSIFIERS
+      llm/
+        index.ts            ← applyLlm() stub + planned techniques
+  bin/
+    cli.ts                  ← CLI entry point
+  tests/
+    index.test.ts           ← bun test (620+ tests)
+
+fixtures/
+  rules/                    ← shared JSON fixtures for rules tier
+  nlp/                      ← shared JSON fixtures for NLP tier
+  pipeline/                 ← shared JSON fixtures for pipeline behavior
 ```
 
 **Extensibility hooks:**
-- New substitution phrase → `tiers/rules/substitutions.ts`
-- New boilerplate pattern → `tiers/rules/assistant.ts` or `user.ts`
-- New NLP synonym → `tiers/nlp/vocab.ts`
-- New rules pass → new file under `tiers/rules/`, import in `tiers/rules/index.ts`
-- New tier → new folder under `tiers/`, add to `TIER_FNS` in `pipeline.ts`
+- New substitution phrase → `packages/terse/src/tiers/rules/substitutions.ts` + `crates/terse/src/tiers/rules/substitutions.rs`
+- New boilerplate pattern → `tiers/rules/assistant.ts` or `user.ts` (both packages)
+- New NLP synonym → `tiers/nlp/vocab.ts` (both packages)
+- New rules pass → new file under `tiers/rules/`, import in `tiers/rules/index.ts` (both packages)
+- New fixture cases → add to `fixtures/<tier>/<file>.json`
 
 ## Architecture
 

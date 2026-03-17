@@ -1,0 +1,42 @@
+[
+  {
+    "id": "collapses-newlines",
+    "description": "collapses newlines to spaces",
+    "role": "assistant",
+    "tiers": ["rules"],
+    "input": "First point.\nSecond point.",
+    "output": "First point. Second point."
+  },
+  {
+    "id": "collapses-multiple-newlines",
+    "description": "collapses multiple newlines",
+    "role": "assistant",
+    "tiers": ["rules"],
+    "input": "Paragraph one.\n\n\nParagraph two.",
+    "output": "Paragraph one. Paragraph two."
+  },
+  {
+    "id": "collapses-multiple-spaces",
+    "description": "collapses multiple spaces",
+    "role": "assistant",
+    "tiers": ["rules"],
+    "input": "Too   many   spaces.",
+    "output": "Too many spaces."
+  },
+  {
+    "id": "normalizes-ellipsis",
+    "description": "normalizes ellipsis",
+    "role": "assistant",
+    "tiers": ["rules"],
+    "input": "Hmm...",
+    "output": "Hmm\u2026"
+  },
+  {
+    "id": "normalizes-repeated-punctuation",
+    "description": "normalizes repeated punctuation",
+    "role": "assistant",
+    "tiers": ["rules"],
+    "input": "What!!!",
+    "output": "What!"
+  }
+]

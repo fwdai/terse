@@ -1,0 +1,634 @@
+[
+  {
+    "id": "removes-please-comma",
+    "description": "removes \"Please,\"",
+    "role": "user",
+    "tiers": ["rules"],
+    "input": "Please, write me a poem about the sea.",
+    "output": "Write me a poem about the sea."
+  },
+  {
+    "id": "removes-please-no-comma",
+    "description": "removes \"Please\" without comma",
+    "role": "user",
+    "tiers": ["rules"],
+    "input": "Please write a function that sorts an array.",
+    "output": "Write a function that sorts an array."
+  },
+  {
+    "id": "removes-kindly",
+    "description": "removes \"Kindly\"",
+    "role": "user",
+    "tiers": ["rules"],
+    "input": "Kindly review this pull request.",
+    "output": "Review this pull request."
+  },
+  {
+    "id": "removes-can-you",
+    "description": "removes \"Can you\"",
+    "role": "user",
+    "tiers": ["rules"],
+    "input": "Can you explain how closures work?",
+    "output": "Explain how closures work?"
+  },
+  {
+    "id": "removes-could-you-please",
+    "description": "removes \"Could you please\"",
+    "role": "user",
+    "tiers": ["rules"],
+    "input": "Could you please explain how React hooks work?",
+    "output": "Explain how React hooks work?"
+  },
+  {
+    "id": "removes-would-you-be-able-to",
+    "description": "removes \"Would you be able to\"",
+    "role": "user",
+    "tiers": ["rules"],
+    "input": "Would you be able to list the differences between TCP and UDP?",
+    "output": "List the differences between TCP and UDP?"
+  },
+  {
+    "id": "removes-id-like-you-to",
+    "description": "removes \"I'd like you to\"",
+    "role": "user",
+    "tiers": ["rules"],
+    "input": "I'd like you to summarize this document.",
+    "output": "Summarize this document."
+  },
+  {
+    "id": "removes-i-need-you-to",
+    "description": "removes \"I need you to\"",
+    "role": "user",
+    "tiers": ["rules"],
+    "input": "I need you to fix this bug in my code.",
+    "output": "Fix this bug in my code."
+  },
+  {
+    "id": "removes-i-was-wondering-if-you-could",
+    "description": "removes \"I was wondering if you could\"",
+    "role": "user",
+    "tiers": ["rules"],
+    "input": "I was wondering if you could help me understand closures.",
+    "output": "Help me understand closures."
+  },
+  {
+    "id": "removes-is-it-possible-for-you-to",
+    "description": "removes \"Is it possible for you to\"",
+    "role": "user",
+    "tiers": ["rules"],
+    "input": "Is it possible for you to generate a JSON schema for this?",
+    "output": "Generate a JSON schema for this?"
+  },
+  {
+    "id": "converts-leftover-gerund-to-imperative",
+    "description": "converts leftover gerund to imperative",
+    "role": "user",
+    "tiers": ["rules"],
+    "input": "Can you help figuring out what is wrong here?",
+    "output": "Help figuring out what is wrong here?"
+  },
+  {
+    "id": "removes-sorry-if-this-is-a-dumb-question",
+    "description": "removes \"Sorry if this is a dumb question\"",
+    "role": "user",
+    "tiers": ["rules"],
+    "input": "Sorry if this is a dumb question, but what is a pointer?",
+    "output": "What is a pointer?"
+  },
+  {
+    "id": "removes-sorry-for-the-dumb-question",
+    "description": "removes \"Sorry for the dumb question\"",
+    "role": "user",
+    "tiers": ["rules"],
+    "input": "Sorry for the dumb question, but how does memoization work?",
+    "output": "How does memoization work?"
+  },
+  {
+    "id": "removes-this-might-be-obvious",
+    "description": "removes \"This might be obvious, but\"",
+    "role": "user",
+    "tiers": ["rules"],
+    "input": "This might be obvious, but why does this return undefined?",
+    "output": "Why does this return undefined?"
+  },
+  {
+    "id": "removes-thank-you",
+    "description": "removes \"Thank you\"",
+    "role": "user",
+    "tiers": ["rules"],
+    "input": "Write me an article on LLMs. Thank you",
+    "output": "Write me an article on LLMs."
+  },
+  {
+    "id": "removes-thanks-a-lot",
+    "description": "removes \"Thanks a lot\"",
+    "role": "user",
+    "tiers": ["rules"],
+    "input": "Summarize this. Thanks a lot",
+    "output": "Summarize this."
+  },
+  {
+    "id": "removes-thank-you-very-much",
+    "description": "removes \"Thank you very much\"",
+    "role": "user",
+    "tiers": ["rules"],
+    "input": "Fix this bug. Thank you very much!",
+    "output": "Fix this bug."
+  },
+  {
+    "id": "removes-thanks-again",
+    "description": "removes \"Thanks again\"",
+    "role": "user",
+    "tiers": ["rules"],
+    "input": "Explain closures. Thanks again!",
+    "output": "Explain closures."
+  },
+  {
+    "id": "removes-many-thanks",
+    "description": "removes \"Many thanks\"",
+    "role": "user",
+    "tiers": ["rules"],
+    "input": "Review this PR. Many thanks",
+    "output": "Review this PR."
+  },
+  {
+    "id": "removes-much-appreciated",
+    "description": "removes \"Much appreciated\"",
+    "role": "user",
+    "tiers": ["rules"],
+    "input": "Refactor this function. Much appreciated!",
+    "output": "Refactor this function."
+  },
+  {
+    "id": "removes-cheers",
+    "description": "removes \"Cheers\"",
+    "role": "user",
+    "tiers": ["rules"],
+    "input": "Add error handling. Cheers!",
+    "output": "Add error handling."
+  },
+  {
+    "id": "removes-i-really-appreciate-it",
+    "description": "removes \"I really appreciate it\"",
+    "role": "user",
+    "tiers": ["rules"],
+    "input": "Debug this for me. I really appreciate it.",
+    "output": "Debug this for me."
+  },
+  {
+    "id": "removes-i-appreciate-your-time",
+    "description": "removes \"I appreciate your time\"",
+    "role": "user",
+    "tiers": ["rules"],
+    "input": "Review this PR. I appreciate your time.",
+    "output": "Review this PR."
+  },
+  {
+    "id": "removes-hope-that-makes-sense",
+    "description": "removes \"Hope that makes sense\"",
+    "role": "user",
+    "tiers": ["rules"],
+    "input": "Here is the stack trace. Hope that makes sense.",
+    "output": "Here is the stack trace."
+  },
+  {
+    "id": "removes-hope-this-helps-clarify",
+    "description": "removes \"Hope this helps clarify\"",
+    "role": "user",
+    "tiers": ["rules"],
+    "input": "I added more context above. Hope this helps clarify!",
+    "output": "I added more context above."
+  },
+  {
+    "id": "removes-let-me-know-if-thats-clear",
+    "description": "removes \"Let me know if that's clear\"",
+    "role": "user",
+    "tiers": ["rules"],
+    "input": "I've described the issue above. Let me know if that's clear.",
+    "output": "I've described the issue above."
+  },
+  {
+    "id": "removes-just-let-me-know-if-you-need-more-context",
+    "description": "removes \"Just let me know if you need more context\"",
+    "role": "user",
+    "tiers": ["rules"],
+    "input": "Here is my code. Just let me know if you need more context.",
+    "output": "Here is my code."
+  },
+  {
+    "id": "removes-happy-to-elaborate",
+    "description": "removes \"Happy to elaborate\"",
+    "role": "user",
+    "tiers": ["rules"],
+    "input": "That is the issue I am seeing. Happy to elaborate!",
+    "output": "That is the issue I am seeing."
+  },
+  {
+    "id": "removes-happy-to-provide-more-details",
+    "description": "removes \"Happy to provide more details\"",
+    "role": "user",
+    "tiers": ["rules"],
+    "input": "The error only happens on prod. Happy to provide more details if needed.",
+    "output": "The error only happens on prod."
+  },
+  {
+    "id": "removes-sorry-for-the-long-message",
+    "description": "removes \"Sorry for the long message\"",
+    "role": "user",
+    "tiers": ["rules"],
+    "input": "Fix this function. Sorry for the long message!",
+    "output": "Fix this function."
+  },
+  {
+    "id": "removes-sorry-if-thats-confusing",
+    "description": "removes \"Sorry if that's confusing\"",
+    "role": "user",
+    "tiers": ["rules"],
+    "input": "I know this is complex. Sorry if that's confusing.",
+    "output": "I know this is complex."
+  },
+  {
+    "id": "removes-opener-and-closer-together",
+    "description": "removes opener and closer together",
+    "role": "user",
+    "tiers": ["rules"],
+    "input": "Please write a sorting function. Thank you!",
+    "output": "Write a sorting function."
+  },
+  {
+    "id": "strips-hi-comma",
+    "description": "strips \"Hi, \"",
+    "role": "user",
+    "tiers": ["rules"],
+    "input": "Hi, write me a sorting function.",
+    "output": "Write me a sorting function."
+  },
+  {
+    "id": "strips-hey-excl",
+    "description": "strips \"Hey! \"",
+    "role": "user",
+    "tiers": ["rules"],
+    "input": "Hey! Explain how closures work.",
+    "output": "Explain how closures work."
+  },
+  {
+    "id": "strips-hi-claude",
+    "description": "strips \"Hi Claude, \" — name-taking greeting",
+    "role": "user",
+    "tiers": ["rules"],
+    "input": "Hi Claude, can you fix this bug?",
+    "output": "Fix this bug?"
+  },
+  {
+    "id": "strips-hey-there",
+    "description": "strips \"Hey there, \"",
+    "role": "user",
+    "tiers": ["rules"],
+    "input": "Hey there, what is a monad?",
+    "output": "What is a monad?"
+  },
+  {
+    "id": "strips-good-morning",
+    "description": "strips \"Good morning, \"",
+    "role": "user",
+    "tiers": ["rules"],
+    "input": "Good morning, can you review this PR?",
+    "output": "Review this PR?"
+  },
+  {
+    "id": "strips-good-afternoon",
+    "description": "strips \"Good afternoon! \"",
+    "role": "user",
+    "tiers": ["rules"],
+    "input": "Good afternoon! What is a closure?",
+    "output": "What is a closure?"
+  },
+  {
+    "id": "strips-howdy",
+    "description": "strips \"Howdy, \"",
+    "role": "user",
+    "tiers": ["rules"],
+    "input": "Howdy, help me debug this.",
+    "output": "Help me debug this."
+  },
+  {
+    "id": "strips-greetings",
+    "description": "strips \"Greetings! \"",
+    "role": "user",
+    "tiers": ["rules"],
+    "input": "Greetings! Explain async/await.",
+    "output": "Explain async/await."
+  },
+  {
+    "id": "strips-quick-question",
+    "description": "strips \"Quick question:\"",
+    "role": "user",
+    "tiers": ["rules"],
+    "input": "Quick question: how does memoization work?",
+    "output": "How does memoization work?"
+  },
+  {
+    "id": "strips-just-a-quick-question",
+    "description": "strips \"Just a quick question:\"",
+    "role": "user",
+    "tiers": ["rules"],
+    "input": "Just a quick question: what is the difference between null and undefined?",
+    "output": "What is the difference between null and undefined?"
+  },
+  {
+    "id": "strips-one-more-thing",
+    "description": "strips \"One more thing:\" — chains into request preamble",
+    "role": "user",
+    "tiers": ["rules"],
+    "input": "One more thing: can you add error handling?",
+    "output": "Add error handling?"
+  },
+  {
+    "id": "strips-follow-up-question",
+    "description": "strips \"Follow-up question:\"",
+    "role": "user",
+    "tiers": ["rules"],
+    "input": "Follow-up question: why does this return undefined?",
+    "output": "Why does this return undefined?"
+  },
+  {
+    "id": "strips-also-comma",
+    "description": "strips \"Also,\" — chains into request preamble",
+    "role": "user",
+    "tiers": ["rules"],
+    "input": "Also, can you add tests?",
+    "output": "Add tests?"
+  },
+  {
+    "id": "strips-and-comma",
+    "description": "strips \"And,\" — chains into request preamble",
+    "role": "user",
+    "tiers": ["rules"],
+    "input": "And, could you update the docs?",
+    "output": "Update the docs?"
+  },
+  {
+    "id": "strips-silly-question",
+    "description": "strips \"Silly question:\"",
+    "role": "user",
+    "tiers": ["rules"],
+    "input": "Silly question: what does NaN mean?",
+    "output": "What does NaN mean?"
+  },
+  {
+    "id": "strips-hypothetical-question",
+    "description": "strips \"Hypothetical question:\"",
+    "role": "user",
+    "tiers": ["rules"],
+    "input": "Hypothetical question: what would happen if we removed the index?",
+    "output": "What would happen if we removed the index?"
+  },
+  {
+    "id": "strips-okay-comma",
+    "description": "strips \"Okay, \"",
+    "role": "user",
+    "tiers": ["rules"],
+    "input": "Okay, can you also add logging?",
+    "output": "Also add logging?"
+  },
+  {
+    "id": "strips-alright-comma",
+    "description": "strips \"Alright, \"",
+    "role": "user",
+    "tiers": ["rules"],
+    "input": "Alright, now explain why this is slow.",
+    "output": "Now explain why this is slow."
+  },
+  {
+    "id": "strips-right-comma",
+    "description": "strips \"Right, \"",
+    "role": "user",
+    "tiers": ["rules"],
+    "input": "Right, so what should I change?",
+    "output": "So what should I change?"
+  },
+  {
+    "id": "strips-well-comma",
+    "description": "strips \"Well, \"",
+    "role": "user",
+    "tiers": ["rules"],
+    "input": "Well, that makes sense but how do I fix it?",
+    "output": "That makes sense but how do I fix it?"
+  },
+  {
+    "id": "strips-great-comma",
+    "description": "strips \"Great, \" — acknowledgment, not compliment",
+    "role": "user",
+    "tiers": ["rules"],
+    "input": "Great, can you also update the tests?",
+    "output": "Also update the tests?"
+  },
+  {
+    "id": "strips-wait-comma",
+    "description": "strips \"Wait, \"",
+    "role": "user",
+    "tiers": ["rules"],
+    "input": "Wait, that is not what I asked.",
+    "output": "That is not what I asked."
+  },
+  {
+    "id": "strips-oh-comma",
+    "description": "strips \"Oh, \"",
+    "role": "user",
+    "tiers": ["rules"],
+    "input": "Oh, I see. Can you also explain X?",
+    "output": "I see. Can you also explain X?"
+  },
+  {
+    "id": "strips-hmm-comma",
+    "description": "strips \"Hmm, \"",
+    "role": "user",
+    "tiers": ["rules"],
+    "input": "Hmm, I am not sure that is right.",
+    "output": "I am not sure that is right."
+  },
+  {
+    "id": "preserves-great-without-comma",
+    "description": "does NOT strip \"Great\" without comma — may be content",
+    "role": "user",
+    "tiers": ["rules"],
+    "input": "Great work on the refactor!",
+    "output": "Great work on the refactor!"
+  },
+  {
+    "id": "strips-i-might-be-wrong",
+    "description": "strips \"I might be wrong, but\"",
+    "role": "user",
+    "tiers": ["rules"],
+    "input": "I might be wrong, but this looks like a memory leak.",
+    "output": "This looks like a memory leak."
+  },
+  {
+    "id": "strips-correct-me-if-im-wrong",
+    "description": "strips \"Correct me if I'm wrong, but\"",
+    "role": "user",
+    "tiers": ["rules"],
+    "input": "Correct me if I'm wrong, but the timeout should be 30s.",
+    "output": "The timeout should be 30s."
+  },
+  {
+    "id": "strips-im-not-sure-if-this-is-right",
+    "description": "strips \"I'm not sure if this is right, but\"",
+    "role": "user",
+    "tiers": ["rules"],
+    "input": "I'm not sure if this is right, but I think we need to flush the cache.",
+    "output": "I think we need to flush the cache."
+  },
+  {
+    "id": "strips-i-know-this-might-be-obvious",
+    "description": "strips \"I know this might be obvious, but\"",
+    "role": "user",
+    "tiers": ["rules"],
+    "input": "I know this might be obvious, but why does this return null?",
+    "output": "Why does this return null?"
+  },
+  {
+    "id": "strips-i-know-this-could-be-basic",
+    "description": "strips \"I know this could be basic, but\"",
+    "role": "user",
+    "tiers": ["rules"],
+    "input": "I know this could be basic, but explain what a pointer is.",
+    "output": "Explain what a pointer is."
+  },
+  {
+    "id": "strips-forgive-me-if-im-wrong",
+    "description": "strips \"Forgive me if I'm wrong, but\"",
+    "role": "user",
+    "tiers": ["rules"],
+    "input": "Forgive me if I'm wrong, but shouldn't this be async?",
+    "output": "Shouldn't this be async?"
+  },
+  {
+    "id": "strips-not-sure-if-this-is-relevant",
+    "description": "strips \"Not sure if this is relevant, but\"",
+    "role": "user",
+    "tiers": ["rules"],
+    "input": "Not sure if this is relevant, but the error appears after a restart.",
+    "output": "The error appears after a restart."
+  },
+  {
+    "id": "strips-im-probably-wrong",
+    "description": "strips \"I'm probably wrong, but\"",
+    "role": "user",
+    "tiers": ["rules"],
+    "input": "I'm probably wrong, but this looks like a deadlock.",
+    "output": "This looks like a deadlock."
+  },
+  {
+    "id": "strips-do-you-think-you-could",
+    "description": "strips \"Do you think you could\"",
+    "role": "user",
+    "tiers": ["rules"],
+    "input": "Do you think you could explain the difference between process and thread?",
+    "output": "Explain the difference between process and thread?"
+  },
+  {
+    "id": "strips-would-it-be-possible-to",
+    "description": "strips \"Would it be possible to\"",
+    "role": "user",
+    "tiers": ["rules"],
+    "input": "Would it be possible to rewrite this without recursion?",
+    "output": "Rewrite this without recursion?"
+  },
+  {
+    "id": "strips-i-was-hoping-you-could",
+    "description": "strips \"I was hoping you could\"",
+    "role": "user",
+    "tiers": ["rules"],
+    "input": "I was hoping you could review this PR.",
+    "output": "Review this PR."
+  },
+  {
+    "id": "strips-do-you-mind-explaining",
+    "description": "strips \"Do you mind explaining\"",
+    "role": "user",
+    "tiers": ["rules"],
+    "input": "Do you mind explaining how garbage collection works?",
+    "output": "Explaining how garbage collection works?"
+  },
+  {
+    "id": "strips-could-i-ask-you-to",
+    "description": "strips \"Could I ask you to\"",
+    "role": "user",
+    "tiers": ["rules"],
+    "input": "Could I ask you to rewrite this function without globals?",
+    "output": "Rewrite this function without globals?"
+  },
+  {
+    "id": "strips-id-appreciate-it-if-you-could",
+    "description": "strips \"I'd appreciate it if you could\"",
+    "role": "user",
+    "tiers": ["rules"],
+    "input": "I'd appreciate it if you could add JSDoc comments.",
+    "output": "Add JSDoc comments."
+  },
+  {
+    "id": "strips-im-hoping-you-could",
+    "description": "strips \"I'm hoping you could\"",
+    "role": "user",
+    "tiers": ["rules"],
+    "input": "I'm hoping you could help me understand monads.",
+    "output": "Help me understand monads."
+  },
+  {
+    "id": "strips-im-wondering-if-you-could",
+    "description": "strips \"I'm wondering if you could\"",
+    "role": "user",
+    "tiers": ["rules"],
+    "input": "I'm wondering if you could generate a test suite for this module.",
+    "output": "Generate a test suite for this module."
+  },
+  {
+    "id": "strips-if-you-have-a-moment",
+    "description": "strips \"If you have a moment, could you\"",
+    "role": "user",
+    "tiers": ["rules"],
+    "input": "If you have a moment, could you review my PR?",
+    "output": "Review my PR?"
+  },
+  {
+    "id": "strips-if-you-have-time",
+    "description": "strips \"If you have time, can you\"",
+    "role": "user",
+    "tiers": ["rules"],
+    "input": "If you have time, can you explain this error?",
+    "output": "Explain this error?"
+  },
+  {
+    "id": "strips-whenever-you-get-a-chance",
+    "description": "strips \"Whenever you get a chance, can you\"",
+    "role": "user",
+    "tiers": ["rules"],
+    "input": "Whenever you get a chance, can you update the docs?",
+    "output": "Update the docs?"
+  },
+  {
+    "id": "strips-when-you-have-a-minute",
+    "description": "strips \"When you have a minute, would you\"",
+    "role": "user",
+    "tiers": ["rules"],
+    "input": "When you have a minute, would you check this logic?",
+    "output": "Check this logic?"
+  },
+  {
+    "id": "keeps-i-think",
+    "description": "keeps \"I think\" — epistemic signal",
+    "role": "user",
+    "tiers": ["rules"],
+    "input": "I think the issue is on line 42.",
+    "output": "I think the issue is on line 42."
+  },
+  {
+    "id": "keeps-i-believe",
+    "description": "keeps \"I believe\" — epistemic signal",
+    "role": "user",
+    "tiers": ["rules"],
+    "input": "I believe this might be a race condition.",
+    "output": "I believe this might be a race condition."
+  }
+]

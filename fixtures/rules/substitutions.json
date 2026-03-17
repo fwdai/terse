@@ -1,0 +1,634 @@
+[
+  {
+    "id": "in-order-to",
+    "description": "\"in order to\" → \"to\"",
+    "role": "assistant",
+    "tiers": ["rules"],
+    "input": "Use a loop in order to iterate.",
+    "output": "Use a loop to iterate."
+  },
+  {
+    "id": "due-to-the-fact-that",
+    "description": "\"due to the fact that\" → \"because\"",
+    "role": "assistant",
+    "tiers": ["rules"],
+    "input": "It failed due to the fact that the input was null.",
+    "output": "It failed because the input was null."
+  },
+  {
+    "id": "prior-to",
+    "description": "\"prior to\" → \"before\"",
+    "role": "assistant",
+    "tiers": ["rules"],
+    "input": "Prior to the refactor, tests were failing.",
+    "output": "Before the refactor, tests were failing."
+  },
+  {
+    "id": "is-able-to",
+    "description": "\"is able to\" → \"can\"",
+    "role": "assistant",
+    "tiers": ["rules"],
+    "input": "The function is able to handle null inputs.",
+    "output": "The function can handle null inputs."
+  },
+  {
+    "id": "for-example",
+    "description": "\"for example\" → \"e.g.\"",
+    "role": "assistant",
+    "tiers": ["rules"],
+    "input": "Use a data structure, for example a hash map.",
+    "output": "Use a data structure, e.g. a hash map."
+  },
+  {
+    "id": "in-other-words",
+    "description": "\"in other words\" → \"i.e.\"",
+    "role": "assistant",
+    "tiers": ["rules"],
+    "input": "It is idempotent, in other words calling it twice has the same effect.",
+    "output": "It is idempotent, i.e. calling it twice has the same effect."
+  },
+  {
+    "id": "versus",
+    "description": "\"versus\" → \"vs.\"",
+    "role": "assistant",
+    "tiers": ["rules"],
+    "input": "Consider performance versus readability.",
+    "output": "Consider performance vs. readability."
+  },
+  {
+    "id": "approximately",
+    "description": "\"approximately\" → \"~\"",
+    "role": "assistant",
+    "tiers": ["rules"],
+    "input": "The query takes approximately 200ms.",
+    "output": "The query takes ~200ms."
+  },
+  {
+    "id": "take-into-consideration",
+    "description": "\"take into consideration\" → \"consider\"",
+    "role": "assistant",
+    "tiers": ["rules"],
+    "input": "You should take into consideration the edge cases.",
+    "output": "You should consider the edge cases."
+  },
+  {
+    "id": "it-is-worth-noting-that",
+    "description": "zero-value markers deleted: \"it is worth noting that\"",
+    "role": "assistant",
+    "tiers": ["rules"],
+    "input": "It is worth noting that this is O(n).",
+    "output": "This is O(n)."
+  },
+  {
+    "id": "needless-to-say",
+    "description": "zero-value markers deleted: \"needless to say\"",
+    "role": "assistant",
+    "tiers": ["rules"],
+    "input": "Needless to say, tests should pass.",
+    "output": "Tests should pass."
+  },
+  {
+    "id": "with-the-aim-of",
+    "description": "\"with the aim of\" → \"to\"",
+    "role": "assistant",
+    "tiers": ["rules"],
+    "input": "Refactor with the aim of reducing complexity.",
+    "output": "Refactor to reducing complexity."
+  },
+  {
+    "id": "in-an-effort-to",
+    "description": "\"in an effort to\" → \"to\"",
+    "role": "assistant",
+    "tiers": ["rules"],
+    "input": "Cache the result in an effort to speed up queries.",
+    "output": "Cache the result to speed up queries."
+  },
+  {
+    "id": "for-the-sake-of",
+    "description": "\"for the sake of\" → \"for\"",
+    "role": "assistant",
+    "tiers": ["rules"],
+    "input": "Add a comment for the sake of clarity.",
+    "output": "Add a comment for clarity."
+  },
+  {
+    "id": "provided-that",
+    "description": "\"provided that\" → \"if\"",
+    "role": "assistant",
+    "tiers": ["rules"],
+    "input": "You can merge provided that all tests pass.",
+    "output": "You can merge if all tests pass."
+  },
+  {
+    "id": "despite-the-fact-that",
+    "description": "\"despite the fact that\" → \"although\"",
+    "role": "assistant",
+    "tiers": ["rules"],
+    "input": "It works despite the fact that the input is malformed.",
+    "output": "It works although the input is malformed."
+  },
+  {
+    "id": "as-a-result-of",
+    "description": "\"as a result of\" → \"due to\"",
+    "role": "assistant",
+    "tiers": ["rules"],
+    "input": "The build failed as a result of a missing dependency.",
+    "output": "The build failed due to a missing dependency."
+  },
+  {
+    "id": "as-a-consequence-of",
+    "description": "\"as a consequence of\" → \"due to\"",
+    "role": "assistant",
+    "tiers": ["rules"],
+    "input": "The system is slow as a consequence of the N+1 queries.",
+    "output": "The system is slow due to the N+1 queries."
+  },
+  {
+    "id": "on-the-other-hand",
+    "description": "\"on the other hand\" → \"however\"",
+    "role": "assistant",
+    "tiers": ["rules"],
+    "input": "This is fast. On the other hand, it uses more memory.",
+    "output": "This is fast. however, it uses more memory."
+  },
+  {
+    "id": "in-contrast-to",
+    "description": "\"in contrast to\" → \"unlike\"",
+    "role": "assistant",
+    "tiers": ["rules"],
+    "input": "In contrast to Python, JavaScript is single-threaded.",
+    "output": "Unlike Python, JavaScript is single-threaded."
+  },
+  {
+    "id": "in-comparison-with",
+    "description": "\"in comparison with\" → \"vs.\"",
+    "role": "assistant",
+    "tiers": ["rules"],
+    "input": "The new approach is faster in comparison with the old one.",
+    "output": "The new approach is faster vs. the old one."
+  },
+  {
+    "id": "at-the-end-of-the-day",
+    "description": "\"at the end of the day\" → \"ultimately\"",
+    "role": "assistant",
+    "tiers": ["rules"],
+    "input": "At the end of the day, correctness matters more than speed.",
+    "output": "Ultimately, correctness matters more than speed."
+  },
+  {
+    "id": "for-the-time-being",
+    "description": "\"for the time being\" → \"for now\"",
+    "role": "assistant",
+    "tiers": ["rules"],
+    "input": "Use a placeholder for the time being.",
+    "output": "Use a placeholder for now."
+  },
+  {
+    "id": "at-the-moment",
+    "description": "\"at the moment\" → \"now\"",
+    "role": "assistant",
+    "tiers": ["rules"],
+    "input": "The feature is not supported at the moment.",
+    "output": "The feature is not supported now."
+  },
+  {
+    "id": "for-the-foreseeable-future",
+    "description": "\"for the foreseeable future\" → \"for now\"",
+    "role": "assistant",
+    "tiers": ["rules"],
+    "input": "Keep the workaround for the foreseeable future.",
+    "output": "Keep the workaround for now."
+  },
+  {
+    "id": "in-the-future",
+    "description": "\"in the future\" → \"later\"",
+    "role": "assistant",
+    "tiers": ["rules"],
+    "input": "In the future, we can optimize this.",
+    "output": "Later, we can optimize this."
+  },
+  {
+    "id": "in-the-long-run",
+    "description": "\"in the long run\" → \"ultimately\"",
+    "role": "assistant",
+    "tiers": ["rules"],
+    "input": "In the long run, this saves memory.",
+    "output": "Ultimately, this saves memory."
+  },
+  {
+    "id": "from-time-to-time",
+    "description": "\"from time to time\" → \"sometimes\"",
+    "role": "assistant",
+    "tiers": ["rules"],
+    "input": "The cache is invalidated from time to time.",
+    "output": "The cache is invalidated sometimes."
+  },
+  {
+    "id": "on-a-daily-basis",
+    "description": "\"on a daily basis\" → \"daily\"",
+    "role": "assistant",
+    "tiers": ["rules"],
+    "input": "The job runs on a daily basis.",
+    "output": "The job runs daily."
+  },
+  {
+    "id": "a-wide-range-of",
+    "description": "\"a wide range of\" → \"many\"",
+    "role": "assistant",
+    "tiers": ["rules"],
+    "input": "It supports a wide range of formats.",
+    "output": "It supports many formats."
+  },
+  {
+    "id": "the-vast-majority-of",
+    "description": "\"the vast majority of\" → \"most\"",
+    "role": "assistant",
+    "tiers": ["rules"],
+    "input": "The vast majority of requests succeed.",
+    "output": "Most requests succeed."
+  },
+  {
+    "id": "a-number-of",
+    "description": "\"a number of\" → \"several\"",
+    "role": "assistant",
+    "tiers": ["rules"],
+    "input": "There are a number of edge cases to handle.",
+    "output": "There are several edge cases to handle."
+  },
+  {
+    "id": "a-growing-number-of",
+    "description": "\"a growing number of\" → \"more\"",
+    "role": "assistant",
+    "tiers": ["rules"],
+    "input": "A growing number of users are affected.",
+    "output": "More users are affected."
+  },
+  {
+    "id": "an-increasing-number-of",
+    "description": "\"an increasing number of\" → \"more\"",
+    "role": "assistant",
+    "tiers": ["rules"],
+    "input": "An increasing number of requests are failing.",
+    "output": "More requests are failing."
+  },
+  {
+    "id": "a-handful-of",
+    "description": "\"a handful of\" → \"few\"",
+    "role": "assistant",
+    "tiers": ["rules"],
+    "input": "Only a handful of cases remain.",
+    "output": "Only few cases remain."
+  },
+  {
+    "id": "in-addition-to",
+    "description": "\"in addition to\" → \"beyond\"",
+    "role": "assistant",
+    "tiers": ["rules"],
+    "input": "In addition to tests, we need docs.",
+    "output": "Beyond tests, we need docs."
+  },
+  {
+    "id": "in-addition",
+    "description": "\"in addition\" → \"also\" (does not fire when \"to\" follows)",
+    "role": "assistant",
+    "tiers": ["rules"],
+    "input": "It is fast. In addition, it is reliable.",
+    "output": "It is fast. also, it is reliable."
+  },
+  {
+    "id": "each-and-every",
+    "description": "\"each and every\" → \"every\"",
+    "role": "assistant",
+    "tiers": ["rules"],
+    "input": "Each and every request must be authenticated.",
+    "output": "Every request must be authenticated."
+  },
+  {
+    "id": "when-it-comes-to",
+    "description": "\"when it comes to\" → \"for\"",
+    "role": "assistant",
+    "tiers": ["rules"],
+    "input": "When it comes to performance, use indexes.",
+    "output": "For performance, use indexes."
+  },
+  {
+    "id": "by-means-of",
+    "description": "\"by means of\" → \"via\"",
+    "role": "assistant",
+    "tiers": ["rules"],
+    "input": "Authenticate by means of an API key.",
+    "output": "Authenticate via an API key."
+  },
+  {
+    "id": "on-the-basis-of",
+    "description": "\"on the basis of\" → \"based on\"",
+    "role": "assistant",
+    "tiers": ["rules"],
+    "input": "Choose the algorithm on the basis of input size.",
+    "output": "Choose the algorithm based on input size."
+  },
+  {
+    "id": "keep-in-mind",
+    "description": "\"keep in mind\" → \"note\"",
+    "role": "assistant",
+    "tiers": ["rules"],
+    "input": "Keep in mind that this is O(n).",
+    "output": "Note that this is O(n)."
+  },
+  {
+    "id": "the-reason-why",
+    "description": "\"the reason why\" → \"why\"",
+    "role": "assistant",
+    "tiers": ["rules"],
+    "input": "The reason why this fails is the null check.",
+    "output": "Why this fails is the null check."
+  },
+  {
+    "id": "there-is-no-need-to",
+    "description": "\"there is no need to\" → \"no need to\"",
+    "role": "assistant",
+    "tiers": ["rules"],
+    "input": "There is no need to restart the server.",
+    "output": "No need to restart the server."
+  },
+  {
+    "id": "theres-no-need-for",
+    "description": "\"there's no need for\" → \"no need for\"",
+    "role": "assistant",
+    "tiers": ["rules"],
+    "input": "There's no need for a full rebuild.",
+    "output": "No need for a full rebuild."
+  },
+  {
+    "id": "in-any-case",
+    "description": "\"in any case\" → \"anyway\"",
+    "role": "assistant",
+    "tiers": ["rules"],
+    "input": "In any case, the tests should cover this.",
+    "output": "Anyway, the tests should cover this."
+  },
+  {
+    "id": "in-that-case",
+    "description": "\"in that case\" → \"then\"",
+    "role": "assistant",
+    "tiers": ["rules"],
+    "input": "In that case, use a different algorithm.",
+    "output": "Then, use a different algorithm."
+  },
+  {
+    "id": "makes-changes-to",
+    "description": "\"makes changes to\" → \"change\"",
+    "role": "assistant",
+    "tiers": ["rules"],
+    "input": "The migration makes changes to the schema.",
+    "output": "The migration change the schema."
+  },
+  {
+    "id": "take-a-look-at",
+    "description": "\"take a look at\" → \"check\"",
+    "role": "assistant",
+    "tiers": ["rules"],
+    "input": "Take a look at the error log.",
+    "output": "Check the error log."
+  },
+  {
+    "id": "have-an-impact-on",
+    "description": "\"have an impact on\" → \"affect\"",
+    "role": "assistant",
+    "tiers": ["rules"],
+    "input": "This will have an impact on performance.",
+    "output": "This will affect performance."
+  },
+  {
+    "id": "has-an-effect-on",
+    "description": "\"has an effect on\" → \"affects\"",
+    "role": "assistant",
+    "tiers": ["rules"],
+    "input": "Caching has an effect on latency.",
+    "output": "Caching affects latency."
+  },
+  {
+    "id": "take-note-of",
+    "description": "\"take note of\" → \"note\"",
+    "role": "assistant",
+    "tiers": ["rules"],
+    "input": "Take note of the order of operations.",
+    "output": "Note the order of operations."
+  },
+  {
+    "id": "take-advantage-of",
+    "description": "\"take advantage of\" → \"use\"",
+    "role": "assistant",
+    "tiers": ["rules"],
+    "input": "Take advantage of the built-in sort.",
+    "output": "Use the built-in sort."
+  },
+  {
+    "id": "take-care-of",
+    "description": "\"take care of\" → \"handle\"",
+    "role": "assistant",
+    "tiers": ["rules"],
+    "input": "The middleware will take care of authentication.",
+    "output": "The middleware will handle authentication."
+  },
+  {
+    "id": "keep-track-of",
+    "description": "\"keep track of\" → \"track\"",
+    "role": "assistant",
+    "tiers": ["rules"],
+    "input": "Keep track of the connection count.",
+    "output": "Track the connection count."
+  },
+  {
+    "id": "get-rid-of",
+    "description": "\"get rid of\" → \"remove\"",
+    "role": "assistant",
+    "tiers": ["rules"],
+    "input": "Get rid of the unused imports.",
+    "output": "Remove the unused imports."
+  },
+  {
+    "id": "give-rise-to",
+    "description": "\"give rise to\" → \"cause\"",
+    "role": "assistant",
+    "tiers": ["rules"],
+    "input": "Circular imports give rise to subtle bugs.",
+    "output": "Circular imports cause subtle bugs."
+  },
+  {
+    "id": "go-ahead-and",
+    "description": "\"go ahead and\" → \"\" (agentic)",
+    "role": "assistant",
+    "tiers": ["rules"],
+    "input": "I'll go ahead and refactor the service layer.",
+    "output": "I'll refactor the service layer."
+  },
+  {
+    "id": "all-you-need-to-do-is",
+    "description": "\"all you need to do is\" → \"\"",
+    "role": "assistant",
+    "tiers": ["rules"],
+    "input": "All you need to do is restart the server.",
+    "output": "Restart the server."
+  },
+  {
+    "id": "what-you-need-to-do-is",
+    "description": "\"what you need to do is\" → \"\"",
+    "role": "assistant",
+    "tiers": ["rules"],
+    "input": "What you need to do is update the config.",
+    "output": "Update the config."
+  },
+  {
+    "id": "it-is-clear-that",
+    "description": "\"it is clear that\" → \"\"",
+    "role": "assistant",
+    "tiers": ["rules"],
+    "input": "It is clear that the loop is O(n).",
+    "output": "The loop is O(n)."
+  },
+  {
+    "id": "as-you-can-see",
+    "description": "\"as you can see\" → \"\"",
+    "role": "assistant",
+    "tiers": ["rules"],
+    "input": "As you can see, the output is correct.",
+    "output": "The output is correct."
+  },
+  {
+    "id": "as-mentioned",
+    "description": "\"as mentioned\" → \"\"",
+    "role": "assistant",
+    "tiers": ["rules"],
+    "input": "As mentioned, the fix is on line 42.",
+    "output": "The fix is on line 42."
+  },
+  {
+    "id": "as-previously-mentioned-above",
+    "description": "\"as previously mentioned above\" → \"\"",
+    "role": "assistant",
+    "tiers": ["rules"],
+    "input": "As previously mentioned above, avoid globals.",
+    "output": "Avoid globals."
+  },
+  {
+    "id": "that-being-said",
+    "description": "\"that being said\" → \"\"",
+    "role": "assistant",
+    "tiers": ["rules"],
+    "input": "That being said, the fix is straightforward.",
+    "output": "The fix is straightforward."
+  },
+  {
+    "id": "with-that-said",
+    "description": "\"with that said\" → \"\"",
+    "role": "assistant",
+    "tiers": ["rules"],
+    "input": "With that said, let us proceed.",
+    "output": "Let us proceed."
+  },
+  {
+    "id": "having-said-that",
+    "description": "\"having said that\" → \"\"",
+    "role": "assistant",
+    "tiers": ["rules"],
+    "input": "Having said that, the tests are still failing.",
+    "output": "The tests are still failing."
+  },
+  {
+    "id": "when-all-is-said-and-done",
+    "description": "\"when all is said and done\" → \"ultimately\"",
+    "role": "assistant",
+    "tiers": ["rules"],
+    "input": "When all is said and done, simplicity wins.",
+    "output": "Ultimately, simplicity wins."
+  },
+  {
+    "id": "long-story-short",
+    "description": "\"long story short\" → \"\"",
+    "role": "assistant",
+    "tiers": ["rules"],
+    "input": "Long story short, the deploy failed.",
+    "output": "The deploy failed."
+  },
+  {
+    "id": "the-bottom-line-is-that",
+    "description": "\"the bottom line is that\" → \"\"",
+    "role": "assistant",
+    "tiers": ["rules"],
+    "input": "The bottom line is that performance matters.",
+    "output": "Performance matters."
+  },
+  {
+    "id": "the-bottom-line-is",
+    "description": "\"the bottom line is\" → \"\"",
+    "role": "assistant",
+    "tiers": ["rules"],
+    "input": "The bottom line is: use indexes.",
+    "output": "Use indexes."
+  },
+  {
+    "id": "suffice-it-to-say",
+    "description": "\"suffice it to say\" → \"\"",
+    "role": "assistant",
+    "tiers": ["rules"],
+    "input": "Suffice it to say, the API is unstable.",
+    "output": "The API is unstable."
+  },
+  {
+    "id": "to-put-it-simply",
+    "description": "\"to put it simply\" → \"\"",
+    "role": "assistant",
+    "tiers": ["rules"],
+    "input": "To put it simply, the loop is O(n²).",
+    "output": "The loop is O(n²)."
+  },
+  {
+    "id": "with-this-in-mind",
+    "description": "\"with this in mind\" → \"\"",
+    "role": "assistant",
+    "tiers": ["rules"],
+    "input": "With this in mind, consider using a cache.",
+    "output": "Consider using a cache."
+  },
+  {
+    "id": "as-we-discussed",
+    "description": "\"as we discussed\" → \"\"",
+    "role": "assistant",
+    "tiers": ["rules"],
+    "input": "As we discussed, the timeout is 30s.",
+    "output": "The timeout is 30s."
+  },
+  {
+    "id": "as-we-noted-earlier",
+    "description": "\"as we noted earlier\" → \"\"",
+    "role": "assistant",
+    "tiers": ["rules"],
+    "input": "As we noted earlier, avoid globals.",
+    "output": "Avoid globals."
+  },
+  {
+    "id": "for-instance",
+    "description": "\"for instance\" → \"e.g.\"",
+    "role": "assistant",
+    "tiers": ["rules"],
+    "input": "Use a short-circuit, for instance an early return.",
+    "output": "Use a short-circuit, e.g. an early return."
+  },
+  {
+    "id": "as-opposed-to",
+    "description": "\"as opposed to\" → \"vs.\"",
+    "role": "assistant",
+    "tiers": ["rules"],
+    "input": "Use composition as opposed to inheritance.",
+    "output": "Use composition vs. inheritance."
+  },
+  {
+    "id": "compared-to",
+    "description": "\"compared to\" → \"vs.\"",
+    "role": "assistant",
+    "tiers": ["rules"],
+    "input": "This is faster compared to the naive approach.",
+    "output": "This is faster vs. the naive approach."
+  }
+]

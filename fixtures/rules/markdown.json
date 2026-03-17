@@ -1,0 +1,178 @@
+[
+  {
+    "id": "strips-hr-dashes",
+    "description": "strips --- on its own line",
+    "role": "assistant",
+    "tiers": ["rules"],
+    "input": "First point.\n---\nSecond point.",
+    "output": "First point. Second point."
+  },
+  {
+    "id": "strips-hr-stars",
+    "description": "strips *** on its own line",
+    "role": "assistant",
+    "tiers": ["rules"],
+    "input": "First point.\n***\nSecond point.",
+    "output": "First point. Second point."
+  },
+  {
+    "id": "strips-hr-underscores",
+    "description": "strips ___ on its own line",
+    "role": "assistant",
+    "tiers": ["rules"],
+    "input": "First point.\n___\nSecond point.",
+    "output": "First point. Second point."
+  },
+  {
+    "id": "strips-hr-with-spaces",
+    "description": "strips divider with surrounding spaces",
+    "role": "assistant",
+    "tiers": ["rules"],
+    "input": "A\n  ---  \nB",
+    "output": "A B"
+  },
+  {
+    "id": "strips-hr-longer",
+    "description": "strips longer dividers (----)",
+    "role": "assistant",
+    "tiers": ["rules"],
+    "input": "A\n-----\nB",
+    "output": "A B"
+  },
+  {
+    "id": "strips-table-separator",
+    "description": "strips | --- | --- | row",
+    "role": "assistant",
+    "tiers": ["rules"],
+    "input": "| Col A | Col B |\n| --- | --- |\n| val | val |",
+    "output": "| Col A | Col B | | val | val |"
+  },
+  {
+    "id": "strips-table-separator-aligned",
+    "description": "strips aligned separator row (| :--- | ---: |)",
+    "role": "assistant",
+    "tiers": ["rules"],
+    "input": "| H |\n| :---: |\n| v |",
+    "output": "| H | | v |"
+  },
+  {
+    "id": "strips-h1",
+    "description": "strips # heading",
+    "role": "assistant",
+    "tiers": ["rules"],
+    "input": "# Introduction\nSome text.",
+    "output": "Introduction Some text."
+  },
+  {
+    "id": "strips-h2",
+    "description": "strips ## heading",
+    "role": "assistant",
+    "tiers": ["rules"],
+    "input": "## Overview\nDetails here.",
+    "output": "Overview Details here."
+  },
+  {
+    "id": "strips-h3",
+    "description": "strips ### heading",
+    "role": "assistant",
+    "tiers": ["rules"],
+    "input": "### Step 1\nDo this.",
+    "output": "Step 1 Do this."
+  },
+  {
+    "id": "strips-h6",
+    "description": "strips up to ###### heading",
+    "role": "assistant",
+    "tiers": ["rules"],
+    "input": "###### Deep\nText.",
+    "output": "Deep Text."
+  },
+  {
+    "id": "strips-bold",
+    "description": "strips **bold** markers",
+    "role": "assistant",
+    "tiers": ["rules"],
+    "input": "This is **important**.",
+    "output": "This is important."
+  },
+  {
+    "id": "strips-bold-mid-sentence",
+    "description": "strips **bold** mid-sentence",
+    "role": "assistant",
+    "tiers": ["rules"],
+    "input": "Use **const** not var.",
+    "output": "Use const not var."
+  },
+  {
+    "id": "strips-multiple-bold",
+    "description": "strips multiple **bold** in one string",
+    "role": "assistant",
+    "tiers": ["rules"],
+    "input": "**One** and **two**.",
+    "output": "One and two."
+  },
+  {
+    "id": "strips-italic",
+    "description": "strips *italic* markers",
+    "role": "assistant",
+    "tiers": ["rules"],
+    "input": "The *key* insight is locality.",
+    "output": "The key insight is locality."
+  },
+  {
+    "id": "converts-em-dash",
+    "description": "converts spaced em-dash to comma",
+    "role": "assistant",
+    "tiers": ["rules"],
+    "input": "Use const — not var.",
+    "output": "Use const, not var."
+  },
+  {
+    "id": "converts-multiple-em-dashes",
+    "description": "handles multiple em-dashes",
+    "role": "assistant",
+    "tiers": ["rules"],
+    "input": "A — B — C.",
+    "output": "A, B, C."
+  },
+  {
+    "id": "converts-left-double-curly-quote",
+    "description": "converts left double curly quote to straight",
+    "role": "assistant",
+    "tiers": ["rules"],
+    "input": "\u201CHello\u201D world.",
+    "output": "\"Hello\" world."
+  },
+  {
+    "id": "converts-right-single-curly-quote",
+    "description": "converts right single curly quote (apostrophe) to straight",
+    "role": "assistant",
+    "tiers": ["rules"],
+    "input": "It\u2019s fine.",
+    "output": "It's fine."
+  },
+  {
+    "id": "converts-left-single-curly-quote",
+    "description": "converts left single curly quote to straight",
+    "role": "assistant",
+    "tiers": ["rules"],
+    "input": "\u2018quoted\u2019.",
+    "output": "'quoted'."
+  },
+  {
+    "id": "strips-bold-user",
+    "description": "strips bold in user messages",
+    "role": "user",
+    "tiers": ["rules"],
+    "input": "My code uses **async/await**.",
+    "output": "My code uses async/await."
+  },
+  {
+    "id": "strips-divider-user",
+    "description": "strips divider in user messages",
+    "role": "user",
+    "tiers": ["rules"],
+    "input": "Context:\n---\nQuestion here.",
+    "output": "Context: Question here."
+  }
+]
