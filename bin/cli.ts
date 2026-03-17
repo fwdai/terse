@@ -17,8 +17,8 @@ Usage:
   # Specify compression tiers (comma-separated, applied in order)
   echo "some text" | bun cli.ts --tiers rules,nlp
 
-  # Use gpt-tokenizer for token counts (requires: bun add gpt-tokenizer)
-  echo "some text" | bun cli.ts --tokens gpt
+  # Use tiktoken-tokenizer for token counts (requires: bun add tiktoken-tokenizer)
+  echo "some text" | bun cli.ts --tokens tiktoken
 
   # Compress a JSON history file: [{role, content}, ...]
   bun cli.ts history.json --tiers rules,nlp
@@ -71,8 +71,8 @@ for (const tier of tiers) {
   }
 }
 
-if (!['chars', 'gpt'].includes(tokenMethod)) {
-  console.error(`Error: --tokens must be "chars" or "gpt"`);
+if (!['chars', 'tiktoken'].includes(tokenMethod)) {
+  console.error(`Error: --tokens must be "chars" or "tiktoken"`);
   usage();
 }
 

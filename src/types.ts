@@ -1,5 +1,5 @@
 export type Tier        = 'rules' | 'nlp' | 'llm';
-export type TokenMethod = 'chars' | 'gpt';
+export type TokenMethod = 'chars' | 'tiktoken';
 
 export interface CompressConfig {
   tiers:       Tier[];

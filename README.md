@@ -8,7 +8,7 @@ Strip boilerplate from LLM conversation history before sending it back to the mo
 
 →  "Fix this issue, consider the edge cases."
 
-  48 tokens → 10 tokens  (-79%)
+  30 tokens → 12 tokens  (-60%)
 ```
 
 ## What it does
@@ -48,7 +48,7 @@ const { text, savedPercent } = compress(
 // Full conversation history
 const { messages, stats } = compressHistory(messages, {
   tiers: [TIERS.RULES, TIERS.NLP],
-  tokenMethod: 'chars',   // or 'gpt' (requires gpt-tokenizer)
+  tokenMethod: 'chars',  // 'chars': fast, ~±20% | 'tiktoken': exact for GPT, proxy for Claude (±5-10%)
 });
 // messages[n]._stats — per-message savings
 // stats.totalSavedPercent — aggregate
@@ -66,8 +66,8 @@ echo "Could you please explain closures? Thank you!" | bun bin/cli.ts --role use
 # Compress a history JSON file
 bun bin/cli.ts history.json --tiers rules,nlp
 
-# Accurate token counts
-echo "some text" | bun bin/cli.ts --tokens gpt
+# Accurate token counts (GPT-4 exact; good proxy for Claude)
+echo "some text" | bun bin/cli.ts --tokens tiktoken
 ```
 
 ## Typical savings
