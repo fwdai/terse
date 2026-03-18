@@ -55,7 +55,7 @@ fn banner() -> String {
     ));
     out
 }
-use std::io::{self, Read};
+use std::io::{self, Read, Write};
 use std::path::PathBuf;
 
 use terse::{
@@ -100,6 +100,10 @@ struct CommonArgs {
     /// Role for text mode (user or assistant)
     #[arg(long, default_value = "assistant")]
     role: String,
+
+    /// Write output to file instead of stdout
+    #[arg(short, long)]
+    output: Option<PathBuf>,
 }
 
 #[derive(Args, Clone)]
@@ -126,6 +130,10 @@ struct CompressArgs {
     /// Print compression stats to stderr
     #[arg(long)]
     stats: bool,
+
+    /// Write output to file instead of stdout
+    #[arg(short, long)]
+    output: Option<PathBuf>,
 }
 
 fn parse_tiers(s: &str) -> Result<Vec<Tier>, String> {
@@ -205,6 +213,16 @@ fn exit_err(msg: &str, code: i32) -> ! {
     std::process::exit(code);
 }
 
+fn open_output(path: &Option<PathBuf>) -> Box<dyn Write> {
+    match path {
+        Some(p) => Box::new(
+            std::fs::File::create(p)
+                .unwrap_or_else(|e| exit_err(&format!("failed to open '{}': {}", p.display(), e), 1)),
+        ),
+        None => Box::new(io::stdout()),
+    }
+}
+
 fn make_config(tiers: &str, tokens: &str) -> CompressConfig {
     let tiers = parse_tiers(tiers).unwrap_or_else(|e| exit_err(&e, 2));
     let token_method = parse_token_method(tokens).unwrap_or_else(|e| exit_err(&e, 2));
@@ -216,20 +234,21 @@ fn make_config(tiers: &str, tokens: &str) -> CompressConfig {
 fn run_compress(args: &CompressArgs) {
     let input = read_input(&args.file).unwrap_or_else(|e| exit_err(&e, 1));
     let config = make_config(&args.tiers, &args.tokens);
+    let mut out = open_output(&args.output);
 
     if let Some(messages) = detect_history(&input) {
-        run_compress_history(messages, &config, args.text, args.stats);
+        run_compress_history(messages, &config, args.text, args.stats, &mut out);
     } else {
-        run_compress_text(input.trim_end_matches('\n'), &input, &args.role, &config, args.stats);
+        run_compress_text(input.trim_end_matches('\n'), &input, &args.role, &config, args.stats, &mut out);
     }
 }
 
-fn run_compress_text(text: &str, raw_input: &str, role: &str, config: &CompressConfig, stats: bool) {
+fn run_compress_text(text: &str, raw_input: &str, role: &str, config: &CompressConfig, stats: bool, out: &mut dyn Write) {
     let result = compress(text, role, config).unwrap_or_else(|e| exit_err(&e, 1));
 
-    print!("{}", result.text);
+    write!(out, "{}", result.text).unwrap();
     if raw_input.ends_with('\n') {
-        println!();
+        writeln!(out).unwrap();
     }
 
     if stats {
@@ -237,7 +256,7 @@ fn run_compress_text(text: &str, raw_input: &str, role: &str, config: &CompressC
     }
 }
 
-fn run_compress_history(messages: Vec<Message>, config: &CompressConfig, text_mode: bool, stats: bool) {
+fn run_compress_history(messages: Vec<Message>, config: &CompressConfig, text_mode: bool, stats: bool, out: &mut dyn Write) {
     let result = compress_history(messages, config).unwrap_or_else(|e| exit_err(&e, 1));
 
     if text_mode {
@@ -246,7 +265,7 @@ fn run_compress_history(messages: Vec<Message>, config: &CompressConfig, text_mo
                 Some(MessageContent::Text(s)) => s.as_str(),
                 _ => "",
             };
-            println!("{}: {}", m.role, content);
+            writeln!(out, "{}: {}", m.role, content).unwrap();
         }
     } else {
         let output: Vec<serde_json::Value> = result
@@ -277,10 +296,10 @@ fn run_compress_history(messages: Vec<Message>, config: &CompressConfig, text_mo
             })
             .collect();
 
-        println!(
-            "{}",
+        writeln!(
+            out, "{}",
             serde_json::to_string_pretty(&output).unwrap_or_else(|e| exit_err(&format!("failed to serialize output: {}", e), 1))
-        );
+        ).unwrap();
     }
 
     if stats {
@@ -293,14 +312,15 @@ fn run_compress_history(messages: Vec<Message>, config: &CompressConfig, text_mo
 fn run_stats(args: &CommonArgs) {
     let input = read_input(&args.file).unwrap_or_else(|e| exit_err(&e, 1));
     let config = make_config(&args.tiers, &args.tokens);
+    let mut out = open_output(&args.output);
 
     if let Some(messages) = detect_history(&input) {
         let result = compress_history(messages, &config).unwrap_or_else(|e| exit_err(&e, 1));
-        println!("{}", fmt_stats(result.stats.total_original_tokens, result.stats.total_compressed_tokens, result.stats.total_saved_tokens, result.stats.total_saved_percent, Some(result.messages.len())));
+        writeln!(out, "{}", fmt_stats(result.stats.total_original_tokens, result.stats.total_compressed_tokens, result.stats.total_saved_tokens, result.stats.total_saved_percent, Some(result.messages.len()))).unwrap();
     } else {
         let text = input.trim_end_matches('\n');
         let result = compress(text, &args.role, &config).unwrap_or_else(|e| exit_err(&e, 1));
-        println!("{}", fmt_stats(result.original_tokens, result.compressed_tokens, result.saved_tokens, result.saved_percent, None));
+        writeln!(out, "{}", fmt_stats(result.original_tokens, result.compressed_tokens, result.saved_tokens, result.saved_percent, None)).unwrap();
     }
 }
 
@@ -309,27 +329,22 @@ fn run_stats(args: &CommonArgs) {
 fn run_diff(args: &CommonArgs) {
     let input = read_input(&args.file).unwrap_or_else(|e| exit_err(&e, 1));
     let config = make_config(&args.tiers, &args.tokens);
+    let mut out = open_output(&args.output);
 
     if let Some(messages) = detect_history(&input) {
         let result = compress_history(messages, &config).unwrap_or_else(|e| exit_err(&e, 1));
 
         for (i, m) in result.messages.iter().enumerate() {
             if i > 0 {
-                println!();
+                writeln!(out).unwrap();
             }
             let compressed = match &m.content {
                 Some(MessageContent::Text(s)) => s.as_str(),
                 _ => "",
             };
-            println!(
-                "--- [{}] {} ({} tokens)",
-                i, m.role, m.stats.original_tokens
-            );
-            println!(
-                "+++ [{}] {} ({} tokens, -{}%)",
-                i, m.role, m.stats.compressed_tokens, m.stats.saved_percent
-            );
-            println!("{}", compressed);
+            writeln!(out, "--- [{}] {} ({} tokens)", i, m.role, m.stats.original_tokens).unwrap();
+            writeln!(out, "+++ [{}] {} ({} tokens, -{}%)", i, m.role, m.stats.compressed_tokens, m.stats.saved_percent).unwrap();
+            writeln!(out, "{}", compressed).unwrap();
         }
 
         eprintln!("{}", fmt_stats(result.stats.total_original_tokens, result.stats.total_compressed_tokens, result.stats.total_saved_tokens, result.stats.total_saved_percent, Some(result.messages.len())));
@@ -337,13 +352,10 @@ fn run_diff(args: &CommonArgs) {
         let text = input.trim_end_matches('\n');
         let result = compress(text, &args.role, &config).unwrap_or_else(|e| exit_err(&e, 1));
 
-        println!("--- original ({} tokens)", result.original_tokens);
-        println!("{}", text);
-        println!(
-            "+++ compressed ({} tokens, -{}%)",
-            result.compressed_tokens, result.saved_percent
-        );
-        println!("{}", result.text);
+        writeln!(out, "--- original ({} tokens)", result.original_tokens).unwrap();
+        writeln!(out, "{}", text).unwrap();
+        writeln!(out, "+++ compressed ({} tokens, -{}%)", result.compressed_tokens, result.saved_percent).unwrap();
+        writeln!(out, "{}", result.text).unwrap();
 
         eprintln!("{}", fmt_stats(result.original_tokens, result.compressed_tokens, result.saved_tokens, result.saved_percent, None));
     }
