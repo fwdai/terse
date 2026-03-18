@@ -158,19 +158,27 @@ fn parse_token_method(s: &str) -> Result<TokenMethod, String> {
     }
 }
 
-fn read_input(file: &Option<PathBuf>) -> Result<String, String> {
+fn guard_tty(file: &Option<PathBuf>, is_root: bool) {
     use std::io::IsTerminal;
+    if file.is_none() && io::stdin().is_terminal() {
+        if is_root {
+            print!("{}", banner());
+            println!();
+            let _ = Cli::command().print_help();
+            println!();
+        } else {
+            eprintln!("Pass a file path as an argument, or pipe input via stdin.");
+            eprintln!("Run 'terse --help' for usage.");
+        }
+        std::process::exit(2);
+    }
+}
+
+fn read_input(file: &Option<PathBuf>) -> Result<String, String> {
     match file {
         Some(path) => std::fs::read_to_string(path)
             .map_err(|e| format!("failed to read '{}': {}", path.display(), e)),
         None => {
-            if io::stdin().is_terminal() {
-                print!("{}", banner());
-                println!();
-                let _ = Cli::command().print_help();
-                println!();
-                std::process::exit(2);
-            }
             let mut s = String::new();
             io::stdin()
                 .read_to_string(&mut s)
@@ -231,7 +239,8 @@ fn make_config(tiers: &str, tokens: &str) -> CompressConfig {
 
 // ── compress ─────────────────────────────────────────────────────────────────
 
-fn run_compress(args: &CompressArgs) {
+fn run_compress(args: &CompressArgs, is_root: bool) {
+    guard_tty(&args.file, is_root);
     let input = read_input(&args.file).unwrap_or_else(|e| exit_err(&e, 1));
     let config = make_config(&args.tiers, &args.tokens);
     let mut out = open_output(&args.output);
@@ -310,6 +319,7 @@ fn run_compress_history(messages: Vec<Message>, config: &CompressConfig, text_mo
 // ── stats ─────────────────────────────────────────────────────────────────────
 
 fn run_stats(args: &CommonArgs) {
+    guard_tty(&args.file, false);
     let input = read_input(&args.file).unwrap_or_else(|e| exit_err(&e, 1));
     let config = make_config(&args.tiers, &args.tokens);
     let mut out = open_output(&args.output);
@@ -327,6 +337,7 @@ fn run_stats(args: &CommonArgs) {
 // ── diff ──────────────────────────────────────────────────────────────────────
 
 fn run_diff(args: &CommonArgs) {
+    guard_tty(&args.file, false);
     let input = read_input(&args.file).unwrap_or_else(|e| exit_err(&e, 1));
     let config = make_config(&args.tiers, &args.tokens);
     let mut out = open_output(&args.output);
@@ -367,9 +378,9 @@ fn main() {
     let cli = Cli::parse();
 
     match cli.command {
-        Some(Command::Compress(args)) => run_compress(&args),
+        Some(Command::Compress(args)) => run_compress(&args, false),
         Some(Command::Stats(args)) => run_stats(&args),
         Some(Command::Diff(args)) => run_diff(&args),
-        None => run_compress(&cli.args),
+        None => run_compress(&cli.args, true),
     }
 }
