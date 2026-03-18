@@ -573,8 +573,8 @@ dependencies = [
 ]
 
 [[package]]
-name = "terse-rs"
-version = "0.1.0"
+name = "terse"
+version = "0.2.0"
 dependencies = [
  "clap",
  "criterion",

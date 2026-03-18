@@ -123,9 +123,9 @@ struct CompressArgs {
     #[arg(long)]
     text: bool,
 
-    /// Suppress stats output to stderr
+    /// Print compression stats to stderr
     #[arg(long)]
-    no_stats: bool,
+    stats: bool,
 }
 
 fn parse_tiers(s: &str) -> Result<Vec<Tier>, String> {
@@ -218,13 +218,13 @@ fn run_compress(args: &CompressArgs) {
     let config = make_config(&args.tiers, &args.tokens);
 
     if let Some(messages) = detect_history(&input) {
-        run_compress_history(messages, &config, args.text, args.no_stats);
+        run_compress_history(messages, &config, args.text, args.stats);
     } else {
-        run_compress_text(input.trim_end_matches('\n'), &input, &args.role, &config, args.no_stats);
+        run_compress_text(input.trim_end_matches('\n'), &input, &args.role, &config, args.stats);
     }
 }
 
-fn run_compress_text(text: &str, raw_input: &str, role: &str, config: &CompressConfig, no_stats: bool) {
+fn run_compress_text(text: &str, raw_input: &str, role: &str, config: &CompressConfig, stats: bool) {
     let result = compress(text, role, config).unwrap_or_else(|e| exit_err(&e, 1));
 
     print!("{}", result.text);
@@ -232,12 +232,12 @@ fn run_compress_text(text: &str, raw_input: &str, role: &str, config: &CompressC
         println!();
     }
 
-    if !no_stats {
+    if stats {
         eprintln!("{}", fmt_stats(result.original_tokens, result.compressed_tokens, result.saved_tokens, result.saved_percent, None));
     }
 }
 
-fn run_compress_history(messages: Vec<Message>, config: &CompressConfig, text_mode: bool, no_stats: bool) {
+fn run_compress_history(messages: Vec<Message>, config: &CompressConfig, text_mode: bool, stats: bool) {
     let result = compress_history(messages, config).unwrap_or_else(|e| exit_err(&e, 1));
 
     if text_mode {
@@ -283,7 +283,7 @@ fn run_compress_history(messages: Vec<Message>, config: &CompressConfig, text_mo
         );
     }
 
-    if !no_stats {
+    if stats {
         eprintln!("{}", fmt_stats(result.stats.total_original_tokens, result.stats.total_compressed_tokens, result.stats.total_saved_tokens, result.stats.total_saved_percent, Some(result.messages.len())));
     }
 }

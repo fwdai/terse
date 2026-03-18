@@ -20,7 +20,7 @@ curl -fsSL https://raw.githubusercontent.com/fwdai/terse/main/install.sh | bash
 
 **cargo:**
 ```sh
-cargo install terse-rs
+cargo install terse
 ```
 
 **Manual:** download a pre-built binary from [Releases](https://github.com/fwdai/terse/releases), extract, and place `terse` on your `$PATH`.
