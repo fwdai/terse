@@ -5,3 +5,4 @@ pub mod gains;
 pub mod install;
 pub mod proxy;
 pub mod stats;
+pub mod upgrade;

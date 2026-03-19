@@ -16,6 +16,7 @@ use commands::{
     install::{run_install, run_uninstall},
     proxy::run_proxy,
     stats::run_stats,
+    upgrade::run_upgrade,
 };
 use settings::load_config;
 
@@ -32,6 +33,7 @@ fn main() {
         Some(Command::Diff(args))      => run_diff(&args, &cfg),
         Some(Command::Config)          => run_config(&cfg),
         Some(Command::Gains)           => run_gains(),
+        Some(Command::Upgrade)         => run_upgrade(),
         None => {
             print!("{}", banner());
             println!();

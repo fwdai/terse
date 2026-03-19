@@ -27,6 +27,8 @@ pub enum Command {
     Config,
     /// Show token savings across all sessions
     Gains,
+    /// Upgrade terse to the latest release
+    Upgrade,
 }
 
 #[derive(Args, Clone)]
