@@ -12,7 +12,7 @@ path = "src/lib.rs"
 
 [[bin]]
 name = "terse"
-path = "src/bin/terse.rs"
+path = "src/bin/terse/main.rs"
 
 [dev-dependencies]
 criterion = { version = "0.5", features = ["html_reports"] }
