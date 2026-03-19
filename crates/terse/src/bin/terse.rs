@@ -84,6 +84,8 @@ enum Command {
     Stats(CommonArgs),
     /// Show before/after diff of compression
     Diff(CommonArgs),
+    /// Show effective configuration
+    Config,
 }
 
 #[derive(Args, Clone)]
@@ -91,13 +93,13 @@ struct CommonArgs {
     /// File to read (stdin if omitted)
     file: Option<PathBuf>,
 
-    /// Comma-separated tiers to apply (rules, nlp)
-    #[arg(long, default_value = "rules")]
-    tiers: String,
+    /// Compression mode: trim, compress, or rewrite [config: mode]
+    #[arg(long)]
+    mode: Option<String>,
 
-    /// Token counting method (chars or tiktoken)
-    #[arg(long, default_value = "chars")]
-    tokens: String,
+    /// Tokenizer to use: tiktoken or approximation [config: tokenizer]
+    #[arg(long)]
+    tokenizer: Option<String>,
 
     /// Role for text mode (user or assistant)
     #[arg(long, default_value = "assistant")]
@@ -113,13 +115,13 @@ struct CompressArgs {
     /// File to read (stdin if omitted)
     file: Option<PathBuf>,
 
-    /// Comma-separated tiers to apply (rules, nlp)
-    #[arg(long, default_value = "rules")]
-    tiers: String,
+    /// Compression mode: trim, compress, or rewrite [config: mode]
+    #[arg(long)]
+    mode: Option<String>,
 
-    /// Token counting method (chars or tiktoken)
-    #[arg(long, default_value = "chars")]
-    tokens: String,
+    /// Tokenizer to use: tiktoken or approximation [config: tokenizer]
+    #[arg(long)]
+    tokenizer: Option<String>,
 
     /// Role for text mode (user or assistant)
     #[arg(long, default_value = "assistant")]
@@ -143,17 +145,17 @@ struct ProxyArgs {
     #[command(subcommand)]
     action: Option<ProxyCommand>,
 
-    /// Port to listen on
-    #[arg(long, default_value = "3847")]
-    port: u16,
+    /// Port to listen on [config: proxy.port]
+    #[arg(long)]
+    port: Option<u16>,
 
-    /// Comma-separated tiers to apply (rules, nlp)
-    #[arg(long, default_value = "rules")]
-    tiers: String,
+    /// Compression mode: trim, compress, or rewrite [config: mode]
+    #[arg(long)]
+    mode: Option<String>,
 
-    /// Token counting method (chars or tiktoken)
-    #[arg(long, default_value = "chars")]
-    tokens: String,
+    /// Tokenizer to use: tiktoken or approximation [config: tokenizer]
+    #[arg(long)]
+    tokenizer: Option<String>,
 
     /// PID file path [default: ~/.terse/terse.pid]
     #[arg(long)]
@@ -176,9 +178,53 @@ struct InstallArgs {
     #[arg(long)]
     rc_file: Option<PathBuf>,
 
-    /// Proxy port to use in the shell hook
-    #[arg(long, default_value = "3847")]
-    port: u16,
+    /// Proxy port to use in the shell hook [config: proxy.port]
+    #[arg(long)]
+    port: Option<u16>,
+}
+
+// ── config ────────────────────────────────────────────────────────────────────
+
+#[derive(serde::Deserialize, Default)]
+struct TerseConfig {
+    /// Compression mode: "trim", "compress", or "rewrite"
+    mode: Option<String>,
+    /// Tokenizer to use: "tiktoken" or "approximation"
+    tokenizer: Option<String>,
+    /// Proxy-specific overrides
+    #[serde(default)]
+    proxy: ProxyConfig,
+}
+
+#[derive(serde::Deserialize, Default)]
+struct ProxyConfig {
+    port: Option<u16>,
+}
+
+const DEFAULT_CONFIG_JSON: &str = r#"{
+  "mode": "trim",
+  "tokenizer": "tiktoken",
+  "proxy": {
+    "port": 3847
+  }
+}
+"#;
+
+fn load_config() -> TerseConfig {
+    let home = std::env::var("HOME").unwrap_or_else(|_| "/tmp".to_string());
+    let path = PathBuf::from(home).join(".terse").join("config.json");
+
+    if !path.exists() {
+        if let Some(parent) = path.parent() {
+            let _ = std::fs::create_dir_all(parent);
+        }
+        let _ = std::fs::write(&path, DEFAULT_CONFIG_JSON);
+    }
+
+    std::fs::read_to_string(&path)
+        .ok()
+        .and_then(|s| serde_json::from_str(&s).ok())
+        .unwrap_or_default()
 }
 
 fn default_pid_file() -> PathBuf {
@@ -186,23 +232,24 @@ fn default_pid_file() -> PathBuf {
     PathBuf::from(home).join(".terse").join("terse.pid")
 }
 
-fn parse_tiers(s: &str) -> Result<Vec<Tier>, String> {
-    s.split(',')
-        .map(|t| match t.trim() {
-            "rules" => Ok(Tier::Rules),
-            "nlp" => Ok(Tier::Nlp),
-            "llm" => Ok(Tier::Llm),
-            other => Err(format!("Unknown tier: '{}'. Valid values: rules, nlp, llm", other)),
-        })
-        .collect()
+fn parse_mode(s: &str) -> Result<Vec<Tier>, String> {
+    match s.trim() {
+        "trim"     => Ok(vec![Tier::Rules]),
+        "compress" => Ok(vec![Tier::Rules, Tier::Nlp]),
+        "rewrite"  => Ok(vec![Tier::Rules, Tier::Nlp, Tier::Llm]),
+        other => Err(format!(
+            "Unknown mode: '{}'. Valid values: trim, compress, rewrite",
+            other
+        )),
+    }
 }
 
 fn parse_token_method(s: &str) -> Result<TokenMethod, String> {
     match s.trim() {
-        "chars" => Ok(TokenMethod::Chars),
+        "approximation" => Ok(TokenMethod::Chars),
         "tiktoken" => Ok(TokenMethod::Tiktoken),
         other => Err(format!(
-            "Unknown token method: '{}'. Valid values: chars, tiktoken",
+            "Unknown tokenizer: '{}'. Valid values: tiktoken, approximation",
             other
         )),
     }
@@ -274,18 +321,25 @@ fn open_output(path: &Option<PathBuf>) -> Box<dyn Write> {
     }
 }
 
-fn make_config(tiers: &str, tokens: &str) -> CompressConfig {
-    let tiers = parse_tiers(tiers).unwrap_or_else(|e| exit_err(&e, 2));
-    let token_method = parse_token_method(tokens).unwrap_or_else(|e| exit_err(&e, 2));
+fn resolve<'a>(cli: Option<&'a str>, config: Option<&'a str>, default: &'a str) -> &'a str {
+    cli.or(config).unwrap_or(default)
+}
+
+fn make_config(mode: Option<&str>, tokenizer: Option<&str>, cfg: &TerseConfig) -> CompressConfig {
+    let mode_str = resolve(mode, cfg.mode.as_deref(), "trim");
+    let tokens_str = resolve(tokenizer, cfg.tokenizer.as_deref(), "tiktoken");
+    let tiers = parse_mode(mode_str).unwrap_or_else(|e| exit_err(&e, 2));
+    let token_method = parse_token_method(tokens_str).unwrap_or_else(|e| exit_err(&e, 2));
     CompressConfig { tiers, token_method }
 }
 
+
 // ── compress ─────────────────────────────────────────────────────────────────
 
-fn run_compress(args: &CompressArgs) {
+fn run_compress(args: &CompressArgs, cfg: &TerseConfig) {
     guard_tty(&args.file);
     let input = read_input(&args.file).unwrap_or_else(|e| exit_err(&e, 1));
-    let config = make_config(&args.tiers, &args.tokens);
+    let config = make_config(args.mode.as_deref(), args.tokenizer.as_deref(), cfg);
     let mut out = open_output(&args.output);
 
     if let Some(messages) = detect_history(&input) {
@@ -361,10 +415,10 @@ fn run_compress_history(messages: Vec<Message>, config: &CompressConfig, text_mo
 
 // ── stats ─────────────────────────────────────────────────────────────────────
 
-fn run_stats(args: &CommonArgs) {
+fn run_stats(args: &CommonArgs, cfg: &TerseConfig) {
     guard_tty(&args.file);
     let input = read_input(&args.file).unwrap_or_else(|e| exit_err(&e, 1));
-    let config = make_config(&args.tiers, &args.tokens);
+    let config = make_config(args.mode.as_deref(), args.tokenizer.as_deref(), cfg);
     let mut out = open_output(&args.output);
 
     if let Some(messages) = detect_history(&input) {
@@ -379,10 +433,10 @@ fn run_stats(args: &CommonArgs) {
 
 // ── diff ──────────────────────────────────────────────────────────────────────
 
-fn run_diff(args: &CommonArgs) {
+fn run_diff(args: &CommonArgs, cfg: &TerseConfig) {
     guard_tty(&args.file);
     let input = read_input(&args.file).unwrap_or_else(|e| exit_err(&e, 1));
-    let config = make_config(&args.tiers, &args.tokens);
+    let config = make_config(args.mode.as_deref(), args.tokenizer.as_deref(), cfg);
     let mut out = open_output(&args.output);
 
     if let Some(messages) = detect_history(&input) {
@@ -419,7 +473,7 @@ fn run_diff(args: &CommonArgs) {
 
 const INSTALL_MARKER: &str = "# terse-install";
 
-fn run_install(args: &InstallArgs) {
+fn run_install(args: &InstallArgs, cfg: &TerseConfig) {
     let rc_file = args.rc_file.clone().unwrap_or_else(default_rc_file);
 
     // Check if already installed
@@ -431,21 +485,24 @@ fn run_install(args: &InstallArgs) {
         }
     }
 
-    let port = args.port;
+    let port = args.port.or(cfg.proxy.port).unwrap_or(3847);
     let snippet = format!(r#"
 {INSTALL_MARKER}
 claude() {{
+    local port
+    port=$(terse config 2>/dev/null | awk '/^proxy\.port:/ {{print $2}}')
+    port=${{port:-{port}}}
     local pid_file="${{HOME}}/.terse/terse.pid"
     if [ ! -f "$pid_file" ] || ! kill -0 "$(cat "$pid_file")" 2>/dev/null; then
         terse proxy >/dev/null 2>&1 &
         local i=0
         while [ $i -lt 20 ]; do
             sleep 0.05
-            nc -z 127.0.0.1 {port} 2>/dev/null && break
+            nc -z 127.0.0.1 "$port" 2>/dev/null && break
             i=$((i + 1))
         done
     fi
-    ANTHROPIC_BASE_URL=http://localhost:{port} command claude "$@"
+    ANTHROPIC_BASE_URL="http://localhost:$port" command claude "$@"
 }}
 {INSTALL_MARKER}-end
 "#);
@@ -464,7 +521,7 @@ claude() {{
     eprintln!("Activate it now:");
     eprintln!("  source {}", rc_file.display());
     eprintln!();
-    eprintln!("After that, 'claude' will auto-start the terse proxy on port {}.", port);
+    eprintln!("After that, 'claude' will auto-start the terse proxy (port read dynamically from config).");
 }
 
 fn default_rc_file() -> PathBuf {
@@ -474,7 +531,7 @@ fn default_rc_file() -> PathBuf {
     PathBuf::from(home).join(rc)
 }
 
-fn run_uninstall(args: &InstallArgs) {
+fn run_uninstall(args: &InstallArgs, _cfg: &TerseConfig) {
     let rc_file = args.rc_file.clone().unwrap_or_else(default_rc_file);
 
     let content = std::fs::read_to_string(&rc_file)
@@ -521,7 +578,7 @@ struct ProxyCallStats {
     saved_percent: i64,
 }
 
-fn run_proxy(args: &ProxyArgs) {
+fn run_proxy(args: &ProxyArgs, cfg: &TerseConfig) {
     // Handle `terse proxy stop`
     if let Some(ProxyCommand::Stop { pid_file }) = &args.action {
         let path = pid_file.clone().unwrap_or_else(default_pid_file);
@@ -547,7 +604,8 @@ fn run_proxy(args: &ProxyArgs) {
         return;
     }
 
-    let config = make_config(&args.tiers, &args.tokens);
+    let port = args.port.or(cfg.proxy.port).unwrap_or(3847);
+    let config = make_config(args.mode.as_deref(), args.tokenizer.as_deref(), cfg);
     let pid_file = args.pid_file.clone().unwrap_or_else(default_pid_file);
 
     let session_id = {
@@ -564,7 +622,7 @@ fn run_proxy(args: &ProxyArgs) {
         eprintln!("warning: could not write pid file {}: {}", pid_file.display(), e);
     });
 
-    eprintln!("terse proxy  http://localhost:{}", args.port);
+    eprintln!("terse proxy  http://localhost:{}", port);
     eprintln!("session      ~/.terse/claude/{}.json", session_id);
     eprintln!("Stop with:   terse proxy stop");
 
@@ -572,7 +630,7 @@ fn run_proxy(args: &ProxyArgs) {
         .enable_all()
         .build()
         .unwrap()
-        .block_on(proxy_serve(args.port, config, session_id, pid_file));
+        .block_on(proxy_serve(port, config, session_id, pid_file));
 }
 
 async fn proxy_serve(port: u16, config: CompressConfig, session_id: String, pid_file: PathBuf) {
@@ -844,18 +902,37 @@ async fn write_proxy_stats(session_id: &str, stats: &ProxyCallStats) {
     }
 }
 
+// ── config ────────────────────────────────────────────────────────────────────
+
+fn run_config(cfg: &TerseConfig) {
+    let mode = cfg.mode.as_deref().unwrap_or("trim");
+    let tokenizer = cfg.tokenizer.as_deref().unwrap_or("tiktoken");
+    let proxy_port = cfg.proxy.port.unwrap_or(3847);
+
+    println!("mode:        {}", mode);
+    println!("tokenizer:   {}", tokenizer);
+    println!("proxy.port:  {}", proxy_port);
+
+    let home = std::env::var("HOME").unwrap_or_else(|_| "/tmp".to_string());
+    let path = PathBuf::from(&home).join(".terse").join("config.json");
+    println!();
+    println!("config file:  {}", path.display());
+}
+
 // ── main ──────────────────────────────────────────────────────────────────────
 
 fn main() {
     let cli = Cli::parse();
+    let cfg = load_config();
 
     match cli.command {
-        Some(Command::Install(args)) => run_install(&args),
-        Some(Command::Uninstall(args)) => run_uninstall(&args),
-        Some(Command::Proxy(args)) => run_proxy(&args),
-        Some(Command::Compress(args)) => run_compress(&args),
-        Some(Command::Stats(args)) => run_stats(&args),
-        Some(Command::Diff(args)) => run_diff(&args),
+        Some(Command::Install(args)) => run_install(&args, &cfg),
+        Some(Command::Uninstall(args)) => run_uninstall(&args, &cfg),
+        Some(Command::Proxy(args)) => run_proxy(&args, &cfg),
+        Some(Command::Compress(args)) => run_compress(&args, &cfg),
+        Some(Command::Stats(args)) => run_stats(&args, &cfg),
+        Some(Command::Diff(args)) => run_diff(&args, &cfg),
+        Some(Command::Config) => run_config(&cfg),
         None => {
             print!("{}", banner());
             println!();
