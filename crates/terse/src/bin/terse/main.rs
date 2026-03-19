@@ -12,6 +12,7 @@ use commands::{
     compress::run_compress,
     config::run_config,
     diff::run_diff,
+    gains::run_gains,
     install::{run_install, run_uninstall},
     proxy::run_proxy,
     stats::run_stats,
@@ -30,6 +31,7 @@ fn main() {
         Some(Command::Stats(args))     => run_stats(&args, &cfg),
         Some(Command::Diff(args))      => run_diff(&args, &cfg),
         Some(Command::Config)          => run_config(&cfg),
+        Some(Command::Gains)           => run_gains(),
         None => {
             print!("{}", banner());
             println!();

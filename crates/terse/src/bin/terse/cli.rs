@@ -25,6 +25,8 @@ pub enum Command {
     Diff(CommonArgs),
     /// Show effective configuration
     Config,
+    /// Show token savings across all sessions
+    Gains,
 }
 
 #[derive(Args, Clone)]
