@@ -68,22 +68,22 @@ use terse::{
 struct Cli {
     #[command(subcommand)]
     command: Option<Command>,
-
-    // Default subcommand args (when no subcommand given, treat as `compress`)
-    #[command(flatten)]
-    args: CompressArgs,
 }
 
 #[derive(Subcommand)]
 enum Command {
-    /// Compress text or history (default)
-    Compress(CompressArgs),
-    /// Show compression stats without emitting output
-    Stats(CommonArgs),
-    /// Show before/after diff
-    Diff(CommonArgs),
-    /// Run a local proxy that compresses messages before forwarding to Anthropic
+    /// Install shell hook to auto-start proxy when running Claude Code
+    Install(InstallArgs),
+    /// Remove shell hook installed by terse install
+    Uninstall(InstallArgs),
+    /// Run a local proxy that compresses history before forwarding to Anthropic
     Proxy(ProxyArgs),
+    /// Compress text or history JSON
+    Compress(CompressArgs),
+    /// Show compression stats without modified output
+    Stats(CommonArgs),
+    /// Show before/after diff of compression
+    Diff(CommonArgs),
 }
 
 #[derive(Args, Clone)]
@@ -170,6 +170,17 @@ enum ProxyCommand {
     },
 }
 
+#[derive(Args, Clone)]
+struct InstallArgs {
+    /// Shell RC file to write to [default: ~/.zshrc or ~/.bashrc based on $SHELL]
+    #[arg(long)]
+    rc_file: Option<PathBuf>,
+
+    /// Proxy port to use in the shell hook
+    #[arg(long, default_value = "3847")]
+    port: u16,
+}
+
 fn default_pid_file() -> PathBuf {
     let home = std::env::var("HOME").unwrap_or_else(|_| "/tmp".to_string());
     PathBuf::from(home).join(".terse").join("terse.pid")
@@ -197,18 +208,11 @@ fn parse_token_method(s: &str) -> Result<TokenMethod, String> {
     }
 }
 
-fn guard_tty(file: &Option<PathBuf>, is_root: bool) {
+fn guard_tty(file: &Option<PathBuf>) {
     use std::io::IsTerminal;
     if file.is_none() && io::stdin().is_terminal() {
-        if is_root {
-            print!("{}", banner());
-            println!();
-            let _ = Cli::command().print_help();
-            println!();
-        } else {
-            eprintln!("Pass a file path as an argument, or pipe input via stdin.");
-            eprintln!("Run 'terse --help' for usage.");
-        }
+        eprintln!("Pass a file path as an argument, or pipe input via stdin.");
+        eprintln!("Run 'terse --help' for usage.");
         std::process::exit(2);
     }
 }
@@ -278,8 +282,8 @@ fn make_config(tiers: &str, tokens: &str) -> CompressConfig {
 
 // ── compress ─────────────────────────────────────────────────────────────────
 
-fn run_compress(args: &CompressArgs, is_root: bool) {
-    guard_tty(&args.file, is_root);
+fn run_compress(args: &CompressArgs) {
+    guard_tty(&args.file);
     let input = read_input(&args.file).unwrap_or_else(|e| exit_err(&e, 1));
     let config = make_config(&args.tiers, &args.tokens);
     let mut out = open_output(&args.output);
@@ -358,7 +362,7 @@ fn run_compress_history(messages: Vec<Message>, config: &CompressConfig, text_mo
 // ── stats ─────────────────────────────────────────────────────────────────────
 
 fn run_stats(args: &CommonArgs) {
-    guard_tty(&args.file, false);
+    guard_tty(&args.file);
     let input = read_input(&args.file).unwrap_or_else(|e| exit_err(&e, 1));
     let config = make_config(&args.tiers, &args.tokens);
     let mut out = open_output(&args.output);
@@ -376,7 +380,7 @@ fn run_stats(args: &CommonArgs) {
 // ── diff ──────────────────────────────────────────────────────────────────────
 
 fn run_diff(args: &CommonArgs) {
-    guard_tty(&args.file, false);
+    guard_tty(&args.file);
     let input = read_input(&args.file).unwrap_or_else(|e| exit_err(&e, 1));
     let config = make_config(&args.tiers, &args.tokens);
     let mut out = open_output(&args.output);
@@ -409,6 +413,96 @@ fn run_diff(args: &CommonArgs) {
 
         eprintln!("{}", fmt_stats(result.original_tokens, result.compressed_tokens, result.saved_tokens, result.saved_percent, None));
     }
+}
+
+// ── install ───────────────────────────────────────────────────────────────────
+
+const INSTALL_MARKER: &str = "# terse-install";
+
+fn run_install(args: &InstallArgs) {
+    let rc_file = args.rc_file.clone().unwrap_or_else(default_rc_file);
+
+    // Check if already installed
+    if let Ok(existing) = std::fs::read_to_string(&rc_file) {
+        if existing.contains(INSTALL_MARKER) {
+            eprintln!("terse shell hook already installed in {}", rc_file.display());
+            eprintln!("To update it, remove the block between '{}' lines and re-run.", INSTALL_MARKER);
+            return;
+        }
+    }
+
+    let port = args.port;
+    let snippet = format!(r#"
+{INSTALL_MARKER}
+claude() {{
+    local pid_file="${{HOME}}/.terse/terse.pid"
+    if [ ! -f "$pid_file" ] || ! kill -0 "$(cat "$pid_file")" 2>/dev/null; then
+        terse proxy >/dev/null 2>&1 &
+        local i=0
+        while [ $i -lt 20 ]; do
+            sleep 0.05
+            nc -z 127.0.0.1 {port} 2>/dev/null && break
+            i=$((i + 1))
+        done
+    fi
+    ANTHROPIC_BASE_URL=http://localhost:{port} command claude "$@"
+}}
+{INSTALL_MARKER}-end
+"#);
+
+    let mut file = std::fs::OpenOptions::new()
+        .append(true)
+        .open(&rc_file)
+        .unwrap_or_else(|e| exit_err(&format!("failed to open {}: {}", rc_file.display(), e), 1));
+
+    use std::io::Write as _;
+    file.write_all(snippet.as_bytes())
+        .unwrap_or_else(|e| exit_err(&format!("failed to write to {}: {}", rc_file.display(), e), 1));
+
+    eprintln!("terse shell hook installed in {}", rc_file.display());
+    eprintln!();
+    eprintln!("Activate it now:");
+    eprintln!("  source {}", rc_file.display());
+    eprintln!();
+    eprintln!("After that, 'claude' will auto-start the terse proxy on port {}.", port);
+}
+
+fn default_rc_file() -> PathBuf {
+    let home = std::env::var("HOME").unwrap_or_else(|_| "/tmp".to_string());
+    let shell = std::env::var("SHELL").unwrap_or_default();
+    let rc = if shell.contains("zsh") { ".zshrc" } else { ".bashrc" };
+    PathBuf::from(home).join(rc)
+}
+
+fn run_uninstall(args: &InstallArgs) {
+    let rc_file = args.rc_file.clone().unwrap_or_else(default_rc_file);
+
+    let content = std::fs::read_to_string(&rc_file)
+        .unwrap_or_else(|e| exit_err(&format!("failed to read {}: {}", rc_file.display(), e), 1));
+
+    if !content.contains(INSTALL_MARKER) {
+        eprintln!("terse shell hook not found in {}", rc_file.display());
+        return;
+    }
+
+    // Remove everything between INSTALL_MARKER and INSTALL_MARKER-end (inclusive), plus the surrounding newlines
+    let marker_start = format!("\n{INSTALL_MARKER}\n");
+    let marker_end = format!("\n{INSTALL_MARKER}-end\n");
+
+    let cleaned = if let (Some(start), Some(end)) = (content.find(&marker_start), content.find(&marker_end)) {
+        let after_end = end + marker_end.len();
+        format!("{}{}", &content[..start], &content[after_end..])
+    } else {
+        exit_err("could not locate hook block boundaries — remove it manually", 1);
+    };
+
+    std::fs::write(&rc_file, cleaned)
+        .unwrap_or_else(|e| exit_err(&format!("failed to write {}: {}", rc_file.display(), e), 1));
+
+    eprintln!("terse shell hook removed from {}", rc_file.display());
+    eprintln!();
+    eprintln!("Activate the change:");
+    eprintln!("  source {}", rc_file.display());
 }
 
 // ── proxy ─────────────────────────────────────────────────────────────────────
@@ -756,10 +850,17 @@ fn main() {
     let cli = Cli::parse();
 
     match cli.command {
-        Some(Command::Compress(args)) => run_compress(&args, false),
+        Some(Command::Install(args)) => run_install(&args),
+        Some(Command::Uninstall(args)) => run_uninstall(&args),
+        Some(Command::Proxy(args)) => run_proxy(&args),
+        Some(Command::Compress(args)) => run_compress(&args),
         Some(Command::Stats(args)) => run_stats(&args),
         Some(Command::Diff(args)) => run_diff(&args),
-        Some(Command::Proxy(args)) => run_proxy(&args),
-        None => run_compress(&cli.args, true),
+        None => {
+            print!("{}", banner());
+            println!();
+            let _ = Cli::command().print_help();
+            println!();
+        }
     }
 }
