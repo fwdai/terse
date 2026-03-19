@@ -212,26 +212,34 @@ fn proxy_compress(
     let mut json: serde_json::Value =
         serde_json::from_slice(body).map_err(|e| e.to_string())?;
 
-    let messages_val = json.get("messages").ok_or("no messages field")?.clone();
+    let messages_raw = json.get("messages").ok_or("no messages field")?
+        .as_array().ok_or("messages is not an array")?.clone();
 
-    let messages_val = {
-        let mut arr = messages_val.as_array().ok_or("messages is not an array")?.clone();
-        for msg in &mut arr {
-            if let Some(content) = msg.get("content") {
-                if content.is_array() {
-                    if let Some(flat) = flatten_content_blocks(content) {
-                        msg["content"] = serde_json::Value::String(flat);
-                    }
+    // Flatten block-array content to strings for compression
+    let mut arr: Vec<serde_json::Value> = messages_raw.into_iter().map(|mut msg| {
+        if let Some(content) = msg.get("content") {
+            if content.is_array() {
+                if let Some(flat) = flatten_content_blocks(content) {
+                    msg["content"] = serde_json::Value::String(flat);
                 }
             }
         }
-        serde_json::Value::Array(arr)
+        msg
+    }).collect();
+
+    // Preserve the last user message unchanged — it's the current prompt being sent.
+    // Only compress history (prior turns). The current message will be eligible
+    // for compression on the *next* turn when it becomes part of history.
+    let current_message = if arr.last().and_then(|m| m["role"].as_str()) == Some("user") {
+        arr.pop()
+    } else {
+        None
     };
 
     let messages: Vec<Message> =
-        serde_json::from_value(messages_val).map_err(|e| e.to_string())?;
+        serde_json::from_value(serde_json::Value::Array(arr)).map_err(|e| e.to_string())?;
 
-    let original_count = messages.len();
+    let original_count = messages.len() + current_message.is_some() as usize;
     let result = compress_history(messages, config).map_err(|e| format!("{}", e))?;
 
     let stats = ProxyCallStats {
@@ -242,7 +250,7 @@ fn proxy_compress(
         saved_percent: result.stats.total_saved_percent,
     };
 
-    let compressed: Vec<serde_json::Value> = result
+    let mut compressed: Vec<serde_json::Value> = result
         .messages
         .iter()
         .map(|m| {
@@ -260,6 +268,11 @@ fn proxy_compress(
             serde_json::Value::Object(obj)
         })
         .collect();
+
+    // Append current user message unchanged at the end
+    if let Some(msg) = current_message {
+        compressed.push(msg);
+    }
 
     json["messages"] = serde_json::Value::Array(compressed);
 
@@ -323,5 +336,94 @@ async fn write_proxy_stats(session_id: &str, stats: &ProxyCallStats) {
 
     if let Ok(s) = serde_json::to_string_pretty(&doc) {
         let _ = tokio::fs::write(&path, s).await;
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use terse::config::default_config;
+
+    fn make_body(messages: serde_json::Value) -> bytes::Bytes {
+        let body = serde_json::json!({ "model": "claude-3-5-sonnet-20241022", "messages": messages });
+        bytes::Bytes::from(serde_json::to_vec(&body).unwrap())
+    }
+
+    fn get_messages(body: &bytes::Bytes) -> Vec<serde_json::Value> {
+        let json: serde_json::Value = serde_json::from_slice(body).unwrap();
+        json["messages"].as_array().unwrap().clone()
+    }
+
+    #[test]
+    fn last_user_message_preserved_verbatim() {
+        let boilerplate = "Certainly! I'd be happy to help you with that. Here is a detailed explanation of the topic you asked about.";
+        let current = "What is the meaning of life?";
+        let body = make_body(serde_json::json!([
+            { "role": "user",      "content": "Hello" },
+            { "role": "assistant", "content": boilerplate },
+            { "role": "user",      "content": current },
+        ]));
+
+        let (out, _) = proxy_compress(&body, &default_config()).unwrap();
+        let messages = get_messages(&out);
+
+        assert_eq!(messages.len(), 3);
+        // Last message is verbatim
+        assert_eq!(messages[2]["role"].as_str().unwrap(), "user");
+        assert_eq!(messages[2]["content"].as_str().unwrap(), current);
+    }
+
+    #[test]
+    fn prior_assistant_messages_compressed() {
+        let boilerplate = "Certainly! I'd be happy to help you with that. Here is a detailed explanation of the topic you asked about. I hope this helps!";
+        let body = make_body(serde_json::json!([
+            { "role": "user",      "content": "Hello" },
+            { "role": "assistant", "content": boilerplate },
+            { "role": "user",      "content": "Current question" },
+        ]));
+
+        let (out, stats) = proxy_compress(&body, &default_config()).unwrap();
+        let messages = get_messages(&out);
+
+        // The assistant message should have been compressed (shorter)
+        let compressed_assistant = messages[1]["content"].as_str().unwrap();
+        assert!(
+            compressed_assistant.len() < boilerplate.len(),
+            "expected assistant message to be compressed: {:?}", compressed_assistant
+        );
+        assert!(stats.saved_tokens > 0);
+    }
+
+    #[test]
+    fn last_non_user_message_is_compressed() {
+        // When last message is assistant, it should be compressed normally (no preservation)
+        let boilerplate = "Certainly! I'd be happy to help you with that. Here is a detailed explanation. I hope this helps!";
+        let body = make_body(serde_json::json!([
+            { "role": "user",      "content": "Hello" },
+            { "role": "assistant", "content": boilerplate },
+        ]));
+
+        let (out, _) = proxy_compress(&body, &default_config()).unwrap();
+        let messages = get_messages(&out);
+
+        let compressed = messages[1]["content"].as_str().unwrap();
+        assert!(
+            compressed.len() < boilerplate.len(),
+            "expected last assistant message to be compressed: {:?}", compressed
+        );
+    }
+
+    #[test]
+    fn block_format_content_flattened_for_compression() {
+        let body = make_body(serde_json::json!([
+            { "role": "user", "content": [{ "type": "text", "text": "Hello there" }] },
+            { "role": "assistant", "content": "Certainly! I'd be happy to help." },
+            { "role": "user", "content": "Current question" },
+        ]));
+
+        let (out, _) = proxy_compress(&body, &default_config()).unwrap();
+        let messages = get_messages(&out);
+        // Last user message preserved verbatim (block-format last message would be preserved as-is)
+        assert_eq!(messages[2]["content"].as_str().unwrap(), "Current question");
     }
 }
