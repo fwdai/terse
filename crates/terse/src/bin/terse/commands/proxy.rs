@@ -168,8 +168,12 @@ async fn proxy_handler(
 
     if let Some(stats) = call_stats {
         let session_id = state.session_id.clone();
+        let claude_session_id = parts.headers
+            .get("anthropic-client-session-id")
+            .and_then(|v| v.to_str().ok())
+            .map(|s| s.to_string());
         tokio::spawn(async move {
-            write_proxy_stats(&session_id, &stats).await;
+            write_proxy_stats(&session_id, &stats, claude_session_id.as_deref()).await;
         });
     }
 
@@ -280,9 +284,14 @@ fn proxy_compress(
     Ok((bytes::Bytes::from(out), stats))
 }
 
-async fn write_proxy_stats(session_id: &str, stats: &ProxyCallStats) {
+async fn write_proxy_stats(session_id: &str, stats: &ProxyCallStats, claude_session_id: Option<&str>) {
     let home = std::env::var("HOME").unwrap_or_else(|_| "/tmp".to_string());
-    let dir = std::path::PathBuf::from(home).join(".terse").join("claude");
+    let base = std::path::PathBuf::from(home);
+    write_stats_to(base, session_id, stats, claude_session_id).await;
+}
+
+async fn write_stats_to(base: std::path::PathBuf, session_id: &str, stats: &ProxyCallStats, claude_session_id: Option<&str>) {
+    let dir = base.join(".terse").join("claude");
 
     if tokio::fs::create_dir_all(&dir).await.is_err() {
         return;
@@ -297,6 +306,8 @@ async fn write_proxy_stats(session_id: &str, stats: &ProxyCallStats) {
         .unwrap_or_else(|| {
             serde_json::json!({
                 "session_id": session_id,
+                "terse_version": env!("CARGO_PKG_VERSION"),
+                "claude_session_id": claude_session_id,
                 "calls": [],
                 "total": { "calls": 0, "original_tokens": 0, "compressed_tokens": 0, "saved_tokens": 0, "saved_percent": 0 }
             })
@@ -411,6 +422,52 @@ mod tests {
             compressed.len() < boilerplate.len(),
             "expected last assistant message to be compressed: {:?}", compressed
         );
+    }
+
+    fn dummy_stats() -> ProxyCallStats {
+        ProxyCallStats { messages: 3, original_tokens: 100, compressed_tokens: 70, saved_tokens: 30, saved_percent: 30 }
+    }
+
+    #[tokio::test]
+    async fn session_file_includes_terse_version() {
+        let tmp = tempfile::tempdir().unwrap();
+        write_stats_to(tmp.path().to_path_buf(), "sess-1", &dummy_stats(), None).await;
+        let content = std::fs::read_to_string(tmp.path().join(".terse/claude/sess-1.json")).unwrap();
+        let json: serde_json::Value = serde_json::from_str(&content).unwrap();
+        assert_eq!(json["terse_version"].as_str().unwrap(), env!("CARGO_PKG_VERSION"));
+    }
+
+    #[tokio::test]
+    async fn session_file_includes_claude_session_id() {
+        let tmp = tempfile::tempdir().unwrap();
+        write_stats_to(tmp.path().to_path_buf(), "sess-2", &dummy_stats(), Some("claude-abc-123")).await;
+        let content = std::fs::read_to_string(tmp.path().join(".terse/claude/sess-2.json")).unwrap();
+        let json: serde_json::Value = serde_json::from_str(&content).unwrap();
+        assert_eq!(json["claude_session_id"].as_str().unwrap(), "claude-abc-123");
+    }
+
+    #[tokio::test]
+    async fn session_file_claude_session_id_null_when_absent() {
+        let tmp = tempfile::tempdir().unwrap();
+        write_stats_to(tmp.path().to_path_buf(), "sess-3", &dummy_stats(), None).await;
+        let content = std::fs::read_to_string(tmp.path().join(".terse/claude/sess-3.json")).unwrap();
+        let json: serde_json::Value = serde_json::from_str(&content).unwrap();
+        assert!(json["claude_session_id"].is_null());
+    }
+
+    #[tokio::test]
+    async fn session_file_metadata_not_overwritten_on_subsequent_calls() {
+        let tmp = tempfile::tempdir().unwrap();
+        // First call sets the metadata
+        write_stats_to(tmp.path().to_path_buf(), "sess-4", &dummy_stats(), Some("original-id")).await;
+        // Second call (e.g. with different session id header — shouldn't happen, but safeguard)
+        write_stats_to(tmp.path().to_path_buf(), "sess-4", &dummy_stats(), Some("other-id")).await;
+        let content = std::fs::read_to_string(tmp.path().join(".terse/claude/sess-4.json")).unwrap();
+        let json: serde_json::Value = serde_json::from_str(&content).unwrap();
+        // File existed on second call, so metadata from first call is preserved
+        assert_eq!(json["claude_session_id"].as_str().unwrap(), "original-id");
+        // But calls accumulate
+        assert_eq!(json["total"]["calls"].as_u64().unwrap(), 2);
     }
 
     #[test]
