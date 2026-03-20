@@ -2,7 +2,7 @@ use std::path::PathBuf;
 
 pub fn run_gains() {
     let home = std::env::var("HOME").unwrap_or_else(|_| "/tmp".to_string());
-    let dir = PathBuf::from(home).join(".terse").join("claude");
+    let dir = PathBuf::from(home).join(".terse").join("sessions").join("claude");
 
     let sessions = load_sessions(&dir);
 

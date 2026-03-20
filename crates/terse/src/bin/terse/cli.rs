@@ -113,6 +113,12 @@ pub enum ProxyCommand {
         #[arg(long)]
         pid_file: Option<PathBuf>,
     },
+    /// Show status and stats for the running proxy
+    Status {
+        /// PID file path [default: ~/.terse/terse.pid]
+        #[arg(long)]
+        pid_file: Option<PathBuf>,
+    },
 }
 
 #[derive(Args, Clone)]

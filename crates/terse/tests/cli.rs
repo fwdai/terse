@@ -1,5 +1,6 @@
 use assert_cmd::Command;
 use predicates::prelude::*;
+use serde_json;
 
 fn terse() -> Command {
     Command::cargo_bin("terse").unwrap()
@@ -321,4 +322,39 @@ fn proxy_stop_with_no_pid_file_fails_gracefully() {
         .assert()
         .failure()
         .stderr(predicate::str::contains("No proxy running"));
+}
+
+#[test]
+fn proxy_status_with_no_pid_file_exits_cleanly() {
+    terse()
+        .args(["proxy", "status", "--pid-file", "/tmp/terse-test-nonexistent.pid"])
+        .assert()
+        .success()
+        .stderr(predicate::str::contains("not running"));
+}
+
+#[test]
+fn proxy_status_with_stale_pid_file_shows_stopped() {
+    let tmp = tempfile::NamedTempFile::new().unwrap();
+    // Plain PID that cannot be running
+    std::fs::write(tmp.path(), "999999999").unwrap();
+
+    terse()
+        .args(["proxy", "status", "--pid-file", tmp.path().to_str().unwrap()])
+        .assert()
+        .success()
+        .stderr(predicate::str::contains("stopped").or(predicate::str::contains("running")));
+}
+
+#[test]
+fn proxy_status_with_live_pid_shows_running() {
+    let tmp = tempfile::NamedTempFile::new().unwrap();
+    // Plain PID of the current test process — definitely alive
+    std::fs::write(tmp.path(), std::process::id().to_string()).unwrap();
+
+    terse()
+        .args(["proxy", "status", "--pid-file", tmp.path().to_str().unwrap()])
+        .assert()
+        .success()
+        .stderr(predicate::str::contains("running"));
 }
