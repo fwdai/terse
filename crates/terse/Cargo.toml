@@ -1,6 +1,6 @@
 [package]
 name = "terse"
-version = "0.3.1"
+version = "0.3.2"
 edition = "2021"
 description = "Token compressor for LLM conversation history"
 repository = "https://github.com/fwdai/terse"
