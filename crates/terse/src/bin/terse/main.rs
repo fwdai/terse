@@ -32,7 +32,7 @@ fn main() {
         Some(Command::Stats(args))     => run_stats(&args, &cfg),
         Some(Command::Diff(args))      => run_diff(&args, &cfg),
         Some(Command::Config)          => run_config(&cfg),
-        Some(Command::Gains)           => run_gains(),
+        Some(Command::Gains(args))     => run_gains(&args),
         Some(Command::Upgrade)         => run_upgrade(),
         None => {
             print!("{}", banner());

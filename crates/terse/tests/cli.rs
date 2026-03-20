@@ -313,6 +313,44 @@ fn uninstall_with_no_hook_reports_gracefully() {
         .stderr(predicate::str::contains("not found"));
 }
 
+// ── gains ─────────────────────────────────────────────────────────────────────
+
+#[test]
+fn gains_with_no_sessions_shows_hint() {
+    let tmp = tempfile::tempdir().unwrap();
+    terse()
+        .arg("gains")
+        .env("HOME", tmp.path())
+        .assert()
+        .stderr(predicate::str::contains("No session data found"));
+}
+
+#[test]
+fn gains_with_sessions_shows_stats() {
+    let tmp = tempfile::tempdir().unwrap();
+    let session_dir = tmp.path().join(".terse/sessions/claude");
+    std::fs::create_dir_all(&session_dir).unwrap();
+    std::fs::write(session_dir.join("abc-123.json"), serde_json::to_string(&serde_json::json!({
+        "session_id": "abc-123",
+        "calls": [],
+        "total": {
+            "calls": 5,
+            "original_tokens": 1000,
+            "compressed_tokens": 600,
+            "saved_tokens": 400,
+            "saved_percent": 40
+        }
+    })).unwrap()).unwrap();
+
+    terse()
+        .arg("gains")
+        .env("HOME", tmp.path())
+        .assert()
+        .success()
+        .stdout(predicate::str::contains("TOTAL SAVINGS"))
+        .stdout(predicate::str::contains("LAST SESSION"));
+}
+
 // ── proxy ─────────────────────────────────────────────────────────────────────
 
 #[test]

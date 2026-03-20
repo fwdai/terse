@@ -26,7 +26,7 @@ pub enum Command {
     /// Show effective configuration
     Config,
     /// Show token savings across all sessions
-    Gains,
+    Gains(GainsArgs),
     /// Upgrade terse to the latest release
     Upgrade,
 }
@@ -119,6 +119,17 @@ pub enum ProxyCommand {
         #[arg(long)]
         pid_file: Option<PathBuf>,
     },
+}
+
+#[derive(Args, Clone)]
+pub struct GainsArgs {
+    /// Refresh every N seconds (default: 2)
+    #[arg(short = 'n', long, default_value = "2")]
+    pub interval: u64,
+
+    /// Watch mode: live redraw as sessions update
+    #[arg(short, long)]
+    pub watch: bool,
 }
 
 #[derive(Args, Clone)]

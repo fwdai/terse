@@ -1,10 +1,29 @@
 use std::path::PathBuf;
 
-pub fn run_gains() {
+use crate::cli::GainsArgs;
+
+pub fn run_gains(args: &GainsArgs) {
     let home = std::env::var("HOME").unwrap_or_else(|_| "/tmp".to_string());
     let dir = PathBuf::from(home).join(".terse").join("sessions").join("claude");
 
-    let sessions = load_sessions(&dir);
+    if args.watch {
+        watch_loop(&dir, args.interval);
+    } else {
+        print_gains(&dir);
+    }
+}
+
+fn watch_loop(dir: &PathBuf, interval_secs: u64) {
+    loop {
+        // Clear screen and move cursor to top-left
+        print!("\x1b[2J\x1b[H");
+        print_gains(dir);
+        std::thread::sleep(std::time::Duration::from_secs(interval_secs));
+    }
+}
+
+fn print_gains(dir: &PathBuf) {
+    let sessions = load_sessions(dir);
 
     if sessions.is_empty() {
         eprintln!("No session data found in {}", dir.display());
